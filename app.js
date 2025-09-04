@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const serverless = require("serverless-http");
 const connectDB = require("./config/db.config");
 const roleRoutes = require("./routes/role");
 const halquaRoutes = require("./routes/halqua");
@@ -39,4 +40,5 @@ app.use("/api/balance", balanceRoutes);
 //   //console.log(`Server running on http://localhost:${PORT}`);
 // });
 
+module.exports = app;
 module.exports.handler = serverless(app);
