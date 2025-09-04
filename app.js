@@ -40,5 +40,5 @@ app.use("/api/balance", balanceRoutes);
 //   //console.log(`Server running on http://localhost:${PORT}`);
 // });
 
-module.exports = app;
-// module.exports.handler = serverless(app);
+// module.exports = app;
+module.exports = serverless(app);
