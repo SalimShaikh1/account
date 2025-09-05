@@ -1,5 +1,5 @@
 const Halqua = require("../models/halqua");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 // Create
 exports.createHalqua = async (req, res) => {

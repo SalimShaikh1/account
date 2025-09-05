@@ -2,7 +2,7 @@ const User = require("../models/user");
 const userQ = require("../utilite/userQuery");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 // Create
 exports.createUser = async (req, res) => {

@@ -1,7 +1,7 @@
 const halqua = require("../models/halqua");
 const Unit = require("../models/unit");
 const unitQ = require("../utilite/unitQuery");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 // Create
 exports.createUnit = async (req, res) => {

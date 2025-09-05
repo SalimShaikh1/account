@@ -1,6 +1,6 @@
 const Book = require("../models/books");
 const bookQ = require("../utilite/bookDetails");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 
 // Create

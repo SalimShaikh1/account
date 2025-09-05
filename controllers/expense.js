@@ -1,6 +1,6 @@
 const Expense = require("../models/expense");
 const expenseQ = require("../utilite/expenseQuery");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 // Create
 exports.createExpense = async (req, res) => {

@@ -1,6 +1,6 @@
 const Circle = require("../models/circle");
 const circleQ = require("../utilite/circleQuery");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 // Create
 exports.createCircle = async (req, res) => {

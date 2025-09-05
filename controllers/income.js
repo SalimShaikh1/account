@@ -1,6 +1,6 @@
 const Income = require("../models/income");
 const incomeQ = require("../utilite/incomeQuery");
-const { sendError, sendSuccess } = require("../Middleware/response");
+const { sendError, sendSuccess } = require("../middleware/response");
 
 // Create
 exports.createIncome = async (req, res) => {
