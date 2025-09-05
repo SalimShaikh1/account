@@ -1,5 +1,5 @@
 const Balance = require("../models/balance");
-const { sendError, sendSuccess } = require("../middleware/response");
+const { sendError, sendSuccess } = require("../Middleware/response");
 
 // Create
 exports.createBalance = async (req, res) => {

@@ -1,5 +1,5 @@
 const Role = require("../models/role");
-const { sendError, sendSuccess } = require("../middleware/response");
+const { sendError, sendSuccess } = require("../Middleware/response");
 
 // Create
 exports.createRole = async (req, res) => {
