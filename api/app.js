@@ -36,6 +36,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/transaction", transactionRoutes);
 app.use("/api/balance", balanceRoutes);
 
+app.get('/api', (req, res) => {
+    res.status(200).json('Welcome to your Vercel Node.js API!');
+});
+
 // app.listen(PORT, () => {
 //   //console.log(`Server running on http://localhost:${PORT}`);
 // });
