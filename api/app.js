@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const serverless = require("serverless-http");
-const connectDB = require("./config/db.config");
+const connectToDatabase = require("./config/db.config");
 const roleRoutes = require("./routes/role");
 const halquaRoutes = require("./routes/halqua");
 const unitRoutes = require("./routes/unit");
@@ -36,8 +36,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/transaction", transactionRoutes);
 app.use("/api/balance", balanceRoutes);
 
-app.get('/api', (req, res) => {
-    connectDB();
+app.get('/api', async (req, res) => {
+    await connectToDatabase();
     res.status(200).json('Welcome to your Vercel Node.js API!');
 });
 
