@@ -38,6 +38,8 @@ app.use("/api/balance", balanceRoutes);
 
 app.get('/api', async (req, res) => {
     await connectToDatabase();
+    console.log('test');
+    
     res.status(200).json('Welcome to your Vercel Node.js API!');
 });
 
