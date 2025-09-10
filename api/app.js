@@ -37,6 +37,7 @@ app.use("/api/transaction", transactionRoutes);
 app.use("/api/balance", balanceRoutes);
 
 app.get('/api', (req, res) => {
+    connectDB();
     res.status(200).json('Welcome to your Vercel Node.js API!');
 });
 
