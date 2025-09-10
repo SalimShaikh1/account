@@ -36,10 +36,12 @@ app.use("/api/transaction", transactionRoutes);
 app.use("/api/balance", balanceRoutes);
 
 app.get('/api', async (req, res) => {
-    await connectToDatabase();
+    // await connectToDatabase();
     console.log('test');
-    
-    res.status(200).json('Welcome to your Vercel Node.js API!');
+
+    // res.status(200).json('Welcome to your Vercel Node.js API!');
+    const region = process.env.VERCEL_REGION || 'unknown';
+    res.json({ region });
 });
 
 // app.listen(PORT, () => {
@@ -49,8 +51,8 @@ app.get('/api', async (req, res) => {
 // module.exports = app;
 
 export default function handler(req, res) {
-  const region = process.env.VERCEL_REGION || 'unknown';
-  res.json({ region });
+    const region = process.env.VERCEL_REGION || 'unknown';
+    res.json({ region });
 }
 
 module.exports = serverless(app);
