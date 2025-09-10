@@ -22,7 +22,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect DB
-connectDB();
+// connectDB();
 app.use('/uploads', express.static('uploads'));
 // Routes
 app.use("/api/roles", roleRoutes);
