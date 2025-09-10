@@ -47,4 +47,10 @@ app.get('/api', async (req, res) => {
 // });
 
 // module.exports = app;
+
+export default function handler(req, res) {
+  const region = process.env.VERCEL_REGION || 'unknown';
+  res.json({ region });
+}
+
 module.exports = serverless(app);
