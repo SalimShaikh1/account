@@ -3,6 +3,6 @@ const express = require("express");
 const router = express.Router();
 const { createBalance } = require("../controllers/balance");
 
-router.get("/", createBalance);
+router.post("/", createBalance);
 
 module.exports = router;

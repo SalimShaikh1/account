@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require('multer');
 const { createTransaction, getTransaction, deleteTransaction, getVocherNumber, getReport, getRecipetReport } = require("../controllers/transaction");
-const auth = require("../Middleware/authMiddleware");
+const auth = require("../middleware/authMiddleware");
 
 
 const storage = multer.diskStorage({
