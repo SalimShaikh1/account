@@ -5,7 +5,7 @@ const {
   getExpenses,
   deleteExpense,
 } = require("../controllers/expense");
-const auth = require("../middleware/authMiddleware");
+const auth = require("../Middleware/authMiddleware");
 
 router.post("/", auth, createExpense);
 router.get("/", auth, getExpenses);

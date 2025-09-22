@@ -5,7 +5,7 @@ const {
   deleteCircle,
   getCircles,
 } = require("../controllers/circle");
-const auth = require("../middleware/authMiddleware");
+const auth = require("../Middleware/authMiddleware");
 
 
 router.post("/", auth, createCircle);

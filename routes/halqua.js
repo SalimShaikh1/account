@@ -4,7 +4,7 @@ const {
   createHalqua,
   deleteHalqua,
 } = require("../controllers/halqua");
-const auth = require("../middleware/authMiddleware");
+const auth = require("../Middleware/authMiddleware");
 
 const router = express.Router();
 
