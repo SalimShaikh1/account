@@ -12,15 +12,16 @@ exports.createUnit = async (req, res) => {
       const unit = await Unit.findOneAndUpdate({ _id: req.body._id }, req.body, {
         new: true,
       });
-      if (!unit) return res.status(404).json({ error: "Unit not found" });
-      res.json(unit);
+      if (!unit) return sendError(res, "Unit not found", [], 401);
+      return sendSuccess(res, "Unit Update successfully", unit);
     } else {
       req.body["createdBy"] = req.user.id;
       const unit = await Unit.create(req.body);
       res.status(201).json(unit);
+      return sendSuccess(res, "Unit Created successfully", unit);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -29,10 +30,9 @@ exports.getUnits = async (req, res) => {
   try {
     const units = await unitQ.getUnit(req)
     //console.log(units);
-    
-    res.json(units);
+    return sendSuccess(res, "Unit Fetched successfully", units);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -45,9 +45,9 @@ exports.deleteUnit = async (req, res) => {
     const unit = await Unit.findOneAndUpdate({ _id: req.body._id }, req.body, {
       new: true,
     });
-    if (!unit) return res.status(404).json({ error: "Unit not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!unit) return sendError(res, "Unit not found", [], 401);
+    return sendSuccess(res, "Deleted successfully", unit);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };

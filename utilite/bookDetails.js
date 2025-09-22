@@ -15,7 +15,10 @@ exports.genrateVocherNumber = async (data) => {
         if (book.currentNumber === book.endNumber) {
             return { message: 'Book is full' }
         }
-        return `${circleName.name.slice(0, 3).toUpperCase()}${unitName.name.slice(0, 3).toUpperCase()}${halquaName.name.slice(0, 3).toUpperCase()}${new Date().getFullYear()}${book.currentNumber == 0 ? book.startNumber : book.currentNumber++}`
+        console.log(book);
+        
+        // return `${circleName.name.slice(0, 3).toUpperCase()}${unitName.name.slice(0, 3).toUpperCase()}${halquaName.name.slice(0, 3).toUpperCase()}${new Date().getFullYear()}${book.currentNumber == 0 ? book.startNumber : book.currentNumber+1}`
+        return `${book.currentNumber == 0 ? book.startNumber : book.currentNumber+1}`
     } else if (data.body.type == 'Voucher') {
         count = await Circle.findOne({ _id: data.user.circleId }).select({currentVocher:1, _id:0});
         return `${circleName.name.slice(0, 3).toUpperCase()}${unitName.name.slice(0, 3).toUpperCase()}${halquaName.name.slice(0, 3).toUpperCase()}${new Date().getFullYear()}${count.currentVocher+1}`
@@ -24,7 +27,7 @@ exports.genrateVocherNumber = async (data) => {
 
 exports.updateBook = async (data) => {
     var book = await Book.findOne({ _id: data.bookId });
-    book.currentNumber = book.currentNumber + 1;
+    book.currentNumber = book.currentNumber == 0 ? book.startNumber : book.currentNumber+1;
     book.save();
 }
 

@@ -16,6 +16,9 @@ exports.getTransactions = async (req) => {
             $match: filter
         },
         {
+            $sort: {receiptVoucherDate: -1}
+        },
+        {
             $lookup: {
                 from: "halquas",
                 localField: "halquaId",
@@ -336,6 +339,7 @@ exports.getReport = async (req) => {
 
 
 
+
         if (transactionDatawithTotal.length == 0) {
             if (voucher != undefined) {
                 voucher.totalAmount = receipt.totalAmount - voucher.totalAmount,
@@ -368,7 +372,30 @@ exports.getReport = async (req) => {
                     cashAmount: 0
                 }
             }
+            if (voucher == undefined) {
+                transactionData.push({
+                    _id: 'Voucher',
+                    totalAmount: 0,
+                    bankAmount: 0,
+                    cashAmount: 0
+                })
+                voucher = transactionData.find(item => item._id === 'Voucher')
+            }
+            if (receipt == undefined) {
+                transactionData.push({
+                    _id: 'Receipt',
+                    totalAmount: 0,
+                    bankAmount: 0,
+                    cashAmount: 0
+                })
+                receipt = transactionData.find(item => item._id === 'Receipt')
+            }
 
+
+
+            console.log((receipt.bankAmount + (receipt1.bankAmount - voucher1.bankAmount)) - voucher.bankAmount, "voucher.bankAmount");
+            console.log((receipt.cashAmount + (receipt1.cashAmount - voucher1.cashAmount)) - voucher.cashAmount);
+            
 
 
             voucher.totalAmount = (receipt.totalAmount - voucher.totalAmount) + (receipt1.totalAmount - voucher1.totalAmount)
@@ -382,6 +409,9 @@ exports.getReport = async (req) => {
     } catch (error) {
         console.log(error);
     }
+
+    console.log(transactionData);
+    
 
 
     return { aCount: mergedData, bCount: transactionData, vocherTotal: transactionData.find(item => item._id == 'Voucher'), receiptTotal: transactionData.find(item => item._id == 'Receipt') };
@@ -624,7 +654,7 @@ exports.getRecipetReport = async (req) => {
             ])
 
             console.log(list);
-            
+
 
             return list;
         }

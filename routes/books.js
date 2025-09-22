@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const { createBook, getBooks, deleteBook } = require("../controllers/books");
-const auth = require("../Middleware/authMiddleware");
+const auth = require("../middleware/authMiddleware");
 
 router.post("/", auth, createBook);
 router.get("/", auth, getBooks);

@@ -17,8 +17,8 @@ exports.createTransaction = async (req, res) => {
       const transaction = await Transaction.findOneAndUpdate({ _id: req.body._id }, req.body, {
         new: true,
       });
-      if (!transaction) return res.status(404).json({ error: "Transaction not found" });
-      res.json(transaction);
+      if (!transaction) return sendError(res, "Transaction not found", [], 401);
+      return sendSuccess(res, "transaction Update successfully", transaction);
     } else {
       req.body["createdBy"] = req.user.id;
       if (req.file) {
@@ -35,10 +35,10 @@ exports.createTransaction = async (req, res) => {
         await bookDetails.updateBook(transaction)
       }
       await income.divideShare(transaction)
-      res.status(201).json(transaction);
+      return sendSuccess(res, "transaction Added successfully", transaction);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -47,11 +47,11 @@ exports.getVocherNumber = async (req, res) => {
     if (req.body) {
       const vocherNumber = await bookDetails.genrateVocherNumber(req);
       //console.log(vocherNumber);
-      res.status(201).json({ vocherNumber: vocherNumber });
+      return sendSuccess(res, "Vocher number successfully", { vocherNumber: vocherNumber });
     }
   }
   catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 }
 
@@ -59,9 +59,10 @@ exports.getVocherNumber = async (req, res) => {
 exports.getTransaction = async (req, res) => {
   try {
     const transactions = await transactionQ.getTransactions(req);
+    return sendSuccess(res, "Transactions fetched  successfully", transactions);
     res.json(transactions);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -74,10 +75,10 @@ exports.deleteTransaction = async (req, res) => {
     const transaction = await Transaction.findOneAndUpdate({ _id: req.body._id }, req.body, {
       new: true,
     });
-    if (!transaction) return res.status(404).json({ error: "Transaction not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!transaction) return sendError(res, "Transaction not found", [], 401);
+    return sendSuccess(res, "Deleted successfully", transaction);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -85,10 +86,10 @@ exports.deleteTransaction = async (req, res) => {
 exports.getReport = async (req, res) => {
   try {
     const report = await transactionQ.getReport(req.body);
-    res.json(report);
+    return sendSuccess(res, "Report fetched successfully", report);
   }
   catch (err) {
-    res.status(500).json({ error: err.message })
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 

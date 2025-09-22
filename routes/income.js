@@ -5,7 +5,7 @@ const {
   deleteIncome,
   getIncomesWithTr,
 } = require("../controllers/income");
-const auth = require("../Middleware/authMiddleware");
+const auth = require("../middleware/authMiddleware");
 
 const router = express.Router();
 

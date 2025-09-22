@@ -15,15 +15,15 @@ exports.createExpense = async (req, res) => {
           new: true,
         }
       );
-      if (!expense) return res.status(404).json({ error: "Expense not found" });
-      res.json(expense);
+      if (!expense) return sendError(res, "Expense not found", [], 401);
+      return sendSuccess(res, "Expense Update successfully", expense);
     } else {
       req.body["createdBy"] = req.user.id;
       const expense = await Expense.create(req.body);
-      res.status(201).json(expense);
+      return sendSuccess(res, "Expense Added successfully", expense);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -31,9 +31,9 @@ exports.createExpense = async (req, res) => {
 exports.getExpenses = async (req, res) => {
   try {
     const expenses = await expenseQ.getExpense(req);
-    res.json(expenses);
+    return sendSuccess(res, "Expenses Fetched successfully", expenses);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -50,9 +50,9 @@ exports.deleteExpense = async (req, res) => {
         new: true,
       }
     );
-    if (!expense) return res.status(404).json({ error: "Expense not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!expense) return sendError(res, "Expense not found", [], 401);
+    sendSuccess(res, "Deleted successfully", expense);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };

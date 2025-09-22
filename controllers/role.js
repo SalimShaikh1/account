@@ -10,15 +10,15 @@ exports.createRole = async (req, res) => {
       const role = await Role.findOneAndUpdate({ _id: req.body._id }, req.body, {
         new: true,
       });
-      if (!role) return res.status(404).json({ error: "Role not found" });
-      res.json(role);
+      if (!role) return sendError(res, "Role not found", [], 401)
+      return sendSuccess(res, "Role Update successfully", role);
     } else {
       req.body["createdBy"] = req.user.id;
       const role = await Role.create(req.body);
-      res.status(201).json(role);
+      return sendSuccess(res, "Role Added successfully", role);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -26,9 +26,9 @@ exports.createRole = async (req, res) => {
 exports.getRoles = async (req, res) => {
   try {
     const roles = await Role.find();
-    res.json(roles);
+    return sendSuccess(res, "Roles Fetched successfully", roles);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -41,9 +41,9 @@ exports.deleteRole = async (req, res) => {
     const role = await Role.findOneAndUpdate({ _id: req.body._id }, req.body, {
       new: true,
     });
-    if (!role) return res.status(404).json({ error: "Role not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!role) return sendError(res, "Role not found", [], 401);
+    sendSuccess(res, "Deleted successfully", role);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };

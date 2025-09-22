@@ -13,20 +13,12 @@ exports.createUser = async (req, res) => {
       const user = await User.findOneAndUpdate({ _id: req.body._id }, req.body, {
         new: true,
       });
-      if (!user) return res.status(404).json({ error: "User not found" });
-      res.json({
-        status: 1,
-        message: "User updated successfully",
-        data: user,
-      });
+      if (!user) return sendError(res, "User not found", [], 401);
+      return sendSuccess(res, "User updated successfully", user);
     } else {
       req.body["createdBy"] = req.user.id;
       const user = await User.create(req.body);
-      res.status(201).json({
-        status: 1,
-        message: "User created successfully",
-        data: user,
-      });
+      return sendSuccess(res, "User created successfully", user);
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -53,10 +45,10 @@ exports.deleteUser = async (req, res) => {
     const user = await User.findOneAndUpdate({ _id: req.body._id }, req.body, {
       new: true,
     });
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!user) return sendError(res, "User not found", [], 401);
+    return sendSuccess(res, "User Deleted successfully", user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -76,7 +68,10 @@ exports.login = async (req, res) => {
       return sendError(res, "Invalid contact or password", [], 401);
     }
 
-    const token = jwt.sign({ id: user._id, halquaId: user.halquaId, unitId: user.unitId, circleId: user.circleId}, process.env.JWT_SECRET, {
+    const userData = await userQ.getUserData({ id: user._id, halquaId: user.halquaId, unitId: user.unitId, circleId: user.circleId})
+    console.log(userData);
+    
+    const token = jwt.sign(userData, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 

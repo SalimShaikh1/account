@@ -8,15 +8,26 @@ exports.createIncome = async (req, res) => {
     if (req.body._id) {
       req.body["modifiedOn"] = Date.now();
       req.body["modifiedBy"] = req.user.id;
-      const income = await Income.findOneAndUpdate(
-        { _id: req.body._id },
-        req.body,
-        {
-          new: true,
+      try {
+        const income = await Income.findOneAndUpdate(
+          { _id: req.body._id },
+          req.body,
+          {
+            new: true,
+          }
+        );
+        if (!income) return sendError(res, "Income not found", [], 401);
+        return sendSuccess(res, "Income Updated successfully", income);
+      }
+      catch (err) {
+        if (err.code === 11000) {
+          console.error('Duplicate entry detected');
+          return sendError(res, "This entry alredy exist", [err.message], 500);
+        } else {
+          console.error('Insert error:', err);
+          return sendError(res, "Server error", [err.message], 500);
         }
-      );
-      if (!income) return res.status(404).json({ error: "Income not found" });
-      res.json(income);
+      }
     } else {
 
 
@@ -25,19 +36,19 @@ exports.createIncome = async (req, res) => {
       try {
         const income = await Income.create(req.body);
         console.log('Inserted:', income);
-        res.status(201).json(income);
-
+        return sendSuccess(res, "Income Added successfully", income);
       } catch (err) {
         if (err.code === 11000) {
           console.error('Duplicate entry detected');
           return sendError(res, "This entry alredy exist", [err.message], 500);
         } else {
           console.error('Insert error:', err);
+          return sendError(res, "Server error", [err.message], 500);
         }
       }
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -45,18 +56,18 @@ exports.createIncome = async (req, res) => {
 exports.getIncomes = async (req, res) => {
   try {
     const incomes = await incomeQ.getIncomes(req);
-    res.json(incomes);
+    return sendSuccess(res, "Incomes Fetched successfully", incomes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
 exports.getIncomesWithTr = async (req, res) => {
   try {
     const incomes = await incomeQ.getIncomesWithTr(req);
-    res.json(incomes);
+    return sendSuccess(res, "Incomes Fetched  successfully", incomes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 }
 
@@ -73,9 +84,9 @@ exports.deleteIncome = async (req, res) => {
         new: true,
       }
     );
-    if (!income) return res.status(404).json({ error: "Income not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!income) return sendError(res, "Income not found", [], 401);
+    sendSuccess(res, "Deleted successfully", income);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };

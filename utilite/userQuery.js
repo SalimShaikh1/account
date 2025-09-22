@@ -1,4 +1,7 @@
 const user = require("../models/user");
+const halqua = require("../models/halqua");
+const unit = require("../models/unit");
+const circle = require("../models/circle");
 
 exports.getUsers = async (req) => {
     const { halquaId, unitId } = req.query
@@ -83,4 +86,15 @@ exports.getUsers = async (req) => {
         }
     ]);
     return users;
+}
+
+exports.getUserData = async (req) => {
+    const halquaData = await halqua.findById(id = req.halquaId)
+    const unitData = await unit.findById(id = req.unitId)
+    const circleData = await circle.findById(id = req.circleId)
+
+    req['halquaName'] = halquaData.name
+    req['unitName'] = unitData.name
+    req['circleName'] = circleData.name
+    return req
 }

@@ -14,15 +14,15 @@ exports.createHalqua = async (req, res) => {
           new: true,
         }
       );
-      if (!halqua) return res.status(404).json({ error: "Halqua not found" });
-      res.json(halqua);
+      if (!halqua) return sendError(res, "Halqua not found", [], 401);
+      return sendSuccess(res, "Halqua Update successfully", halqua);
     } else {
       req.body["createdBy"] = req.user.id;
       const halqua = await Halqua.create(req.body);
-      res.status(201).json(halqua);
+      return sendSuccess(res, "Halqua Added successfully", halqua);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -30,9 +30,9 @@ exports.createHalqua = async (req, res) => {
 exports.getHalquas = async (req, res) => {
   try {
     const halquas = await Halqua.find();
-    res.json(halquas);
+    return sendSuccess(res, "Halquas Fetched successfully", halquas);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -50,9 +50,9 @@ exports.deleteHalqua = async (req, res) => {
         new: true,
       }
     );
-    if (!halqua) return res.status(404).json({ error: "Halqua not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!halqua) return sendError(res, "Halqua not found", [], 401);
+    sendSuccess(res, "Deleted successfully", halqua);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };

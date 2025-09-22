@@ -15,15 +15,15 @@ exports.createCircle = async (req, res) => {
           new: true,
         }
       );
-      if (!circle) return res.status(404).json({ error: "Circle not found" });
-      res.json(circle);
+      if (!circle) return sendError(res, "Circle not found", [], 401);
+      return sendSuccess(res, "Circle Update successfully", circle);
     } else {
       req.body["createdBy"] = req.user.id;
       const circle = await Circle.create(req.body);
-      res.status(201).json(circle);
+      return sendSuccess(res, "Circle Added successfully", circle);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -31,9 +31,9 @@ exports.createCircle = async (req, res) => {
 exports.getCircles = async (req, res) => {
   try {
     const circles = await circleQ.getCircle(req);
-    res.json(circles);
+    return sendSuccess(res, "Circles Fetched successfully", circles);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -50,9 +50,9 @@ exports.deleteCircle = async (req, res) => {
         new: true,
       }
     );
-    if (!circle) return res.status(404).json({ error: "Circle not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!circle) return sendError(res, "Circle not found", [], 401);
+    sendSuccess(res, "Deleted successfully", circle);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };

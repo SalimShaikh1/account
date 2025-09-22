@@ -12,15 +12,15 @@ exports.createBook = async (req, res) => {
       const book = await Book.findOneAndUpdate({ _id: req.body._id }, req.body, {
         new: true,
       });
-      if (!book) return res.status(404).json({ error: "Book not found" });
-      res.json(book);
+      if (!book) return sendError(res, "Book not found", [], 401);
+      return sendSuccess(res, "Book Update successfully", book);
     } else {
       req.body["createdBy"] = req.user.id;
       const book = await Book.create(req.body);
-      res.status(201).json(book);
+      return sendSuccess(res, "Book Added successfully", book);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -28,13 +28,10 @@ exports.createBook = async (req, res) => {
 exports.getBooks = async (req, res) => {
   try {
     let filter = {createdBy: req.user.id};
-    //console.log(filter);
-    
-
     const books = await bookQ.getBooks(req);
-    res.json(books);
+    return sendSuccess(res, "Books Fetched successfully", books);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
 
@@ -47,9 +44,9 @@ exports.deleteBook = async (req, res) => {
     const book = await Book.findOneAndUpdate({ _id: req.body._id }, req.body, {
       new: true,
     });
-    if (!book) return res.status(404).json({ error: "Book not found" });
-    res.json({ message: "Deleted successfully" });
+    if (!book) return sendError(res, "Book not found", [], 401);
+    sendSuccess(res, "Deleted successfully", book);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return sendError(res, "Server error", [err.message], 500);
   }
 };
