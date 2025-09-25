@@ -300,7 +300,13 @@ exports.getReport = async (req) => {
 
     for (let i = 0; i < maxLength; i++) {
         mergedData.push({
-            ...incomeData[i],
+            ...{
+                collection: incomeData[i]?.collection || 0,
+                unitShare: incomeData[i]?.unitShare || 0,
+                cityShare: incomeData[i]?.cityShare || 0,
+                halquaShare: incomeData[i]?.halquaShare || 0,
+                receiptName: incomeData[i]?.receiptName || '',
+            },
             ...{
                 totalCollection: expenseData[i]?.totalCollection || 0,
                 totalUnitShare: expenseData[i]?.totalUnitShare || 0,
