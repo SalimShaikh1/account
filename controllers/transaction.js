@@ -102,3 +102,13 @@ exports.getRecipetReport = async (req, res) => {
     return sendError(res, "Server error", [err.message], 500);
   }
 }
+
+exports.getBalance = async (req, res) => {
+  try {
+    const report = await transactionQ.getBalance(req.body);
+    return sendSuccess(res, "Report fetched successfully", report);
+  }
+  catch (err) {
+    return sendError(res, "Server error", [err.message], 500);
+  }
+}

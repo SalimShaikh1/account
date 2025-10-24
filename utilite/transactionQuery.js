@@ -11,12 +11,15 @@ exports.getTransactions = async (req) => {
     if (type) filter.type = type;
     filter.createdBy = req.user.id;
 
+    console.log(filter);
+
+
     const transactions = await transaction.aggregate([
         {
             $match: filter
         },
         {
-            $sort: {receiptVoucherDate: -1}
+            $sort: { receiptVoucherDate: -1 }
         },
         {
             $lookup: {
@@ -401,7 +404,7 @@ exports.getReport = async (req) => {
 
             console.log((receipt.bankAmount + (receipt1.bankAmount - voucher1.bankAmount)) - voucher.bankAmount, "voucher.bankAmount");
             console.log((receipt.cashAmount + (receipt1.cashAmount - voucher1.cashAmount)) - voucher.cashAmount);
-            
+
 
 
             voucher.totalAmount = (receipt.totalAmount - voucher.totalAmount) + (receipt1.totalAmount - voucher1.totalAmount)
@@ -417,7 +420,7 @@ exports.getReport = async (req) => {
     }
 
     console.log(transactionData);
-    
+
 
 
     return { aCount: mergedData, bCount: transactionData, vocherTotal: transactionData.find(item => item._id == 'Voucher'), receiptTotal: transactionData.find(item => item._id == 'Receipt') };
@@ -700,4 +703,205 @@ exports.getRecipetReport = async (req) => {
         console.log(err);
     }
 
+}
+
+exports.getBalance = async (req) => {
+    try {
+        const perviousQuery = { type: 'Receipt' }
+        const currentQuery = { type: 'Receipt' }
+        const tillQuery = {}
+        tillQuery['result.type'] = 'Voucher';
+
+        perviousQuery['receiptVoucherDate'] = {
+            $lte: req.startDate
+        };
+        currentQuery['receiptVoucherDate'] = {
+            $gte: req.startDate,
+            $lte: req.endDate,
+        };
+
+        tillQuery['result.receiptVoucherDate'] = {
+            $lte: req.endDate
+        };
+
+        if (req.circleId) {
+            perviousQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
+            currentQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
+            tillQuery['result.circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
+        }
+
+        if (req.unitId) {
+            perviousQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            currentQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            tillQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        }
+
+
+        let pervious = await transaction.aggregate([
+            {
+                $match: perviousQuery
+            },
+            {
+                $group:
+                /**
+                 * _id: The id of the group.
+                 * fieldN: The first field name.
+                 */
+                {
+                    _id: "$type",
+                    totalAmount: {
+                        $sum: "$amount"
+                    },
+                    unitShare: {
+                        $sum: "$unitShare"
+                    },
+                    cityShare: {
+                        $sum: "$cityShare"
+                    },
+                    halquaShare: {
+                        $sum: "$halquaShare"
+                    }
+                }
+            }
+        ])
+
+        let current = await transaction.aggregate([
+            {
+                $match: currentQuery
+            },
+            {
+                $group:
+                /**
+                 * _id: The id of the group.
+                 * fieldN: The first field name.
+                 */
+                {
+                    _id: "$type",
+                    totalAmount: {
+                        $sum: "$amount"
+                    },
+                    unitShare: {
+                        $sum: "$unitShare"
+                    },
+                    cityShare: {
+                        $sum: "$cityShare"
+                    },
+                    halquaShare: {
+                        $sum: "$halquaShare"
+                    }
+                }
+            }
+        ])
+
+        let tillDate = await expense.aggregate([
+            {
+                $lookup: {
+                    from: "transactions",
+                    localField: "_id",
+                    foreignField: "head",
+                    as: "result"
+                }
+            },
+            { $unwind: "$result" },
+            {
+                $match: tillQuery
+            },
+            {
+                $group: {
+                    _id: 'expenseMain',
+                    halquaSum: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$expenseMain", "Halqua Hissa"] },
+                                "$result.amount",
+                                0
+                            ]
+                        }
+                    },
+                    citySum: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$expenseMain", "Nazime Shahar"] },
+                                "$result.amount",
+                                0
+                            ]
+                        }
+                    },
+                    unitSum: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { $ne: ["$expenseMain", "Halqua Hissa"] },
+                                        { $ne: ["$expenseMain", "Nazime Shahar"] }
+                                    ]
+                                },
+                                "$result.amount",
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+        ])
+
+        perviousObj = {
+            totalAmount: pervious?.[0]?.['totalAmount'] || 0,
+            unitShare: pervious?.[0]?.['unitShare'] || 0,
+            cityShare: pervious?.[0]?.['cityShare'] || 0,
+            halquaShare: pervious?.[0]?.['halquaShare'] || 0,
+        }
+        currentObj = {
+            totalAmount: current?.[0]?.['totalAmount'] || 0,
+            unitShare: current?.[0]?.['unitShare'] || 0,
+            cityShare: current?.[0]?.['cityShare'] || 0,
+            halquaShare: current?.[0]?.['halquaShare'] || 0,
+        }
+
+        tillDateObj = {
+            totalCollection: tillDate?.[0]?.['totalCollection'] || 0,
+            halquaSum: tillDate?.[0]?.['halquaSum'] || 0,
+            citySum: tillDate?.[0]?.['citySum'] || 0,
+            unitSum: tillDate?.[0]?.['unitSum'] || 0,
+        }
+
+
+
+        tillDateObj['totalCollection'] = tillDateObj['halquaSum'] + tillDateObj['citySum'] + tillDateObj['unitSum']
+
+        const result = {
+            totalAmount:
+                (perviousObj.totalAmount + currentObj.totalAmount) -
+                tillDateObj.totalCollection,
+
+            unitShare:
+                (perviousObj.unitShare + currentObj.unitShare) -
+                tillDateObj.unitSum,
+
+            cityShare:
+                (perviousObj.cityShare + currentObj.cityShare) -
+                tillDateObj.citySum,
+
+            halquaShare:
+                (perviousObj.halquaShare + currentObj.halquaShare) -
+                tillDateObj.halquaSum
+        };
+
+
+
+
+
+        let res = {
+            pervious: perviousObj,
+            current: currentObj,
+            tillDate: tillDateObj,
+            result: result
+        }
+
+
+        return res;
+    } catch (err) {
+        console.log(err);
+
+    }
 }

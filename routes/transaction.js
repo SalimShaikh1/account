@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require('multer');
-const { createTransaction, getTransaction, deleteTransaction, getVocherNumber, getReport, getRecipetReport } = require("../controllers/transaction");
+const { createTransaction, getTransaction, deleteTransaction, getVocherNumber, getReport, getRecipetReport, getBalance } = require("../controllers/transaction");
 const auth = require("../Middleware/authMiddleware");
 
 
@@ -22,6 +22,7 @@ router.post("/", auth, upload.single('file'), createTransaction);
 router.get("/", auth, getTransaction);
 router.post("/delete", auth, deleteTransaction);
 router.post("/report", auth, getReport);
+router.post("/getBalance", auth, getBalance);
 router.post("/recipetReport", auth, getRecipetReport);
 
 router.post("/vocherNumber", auth, getVocherNumber);
