@@ -22,7 +22,7 @@ router.post("/", auth, upload.single('file'), createTransaction);
 router.get("/", auth, getTransaction);
 router.post("/delete", auth, deleteTransaction);
 router.post("/report", auth, getReport);
-router.post("/getBalance", auth, getBalance);
+router.post("/getBalance", auth, getBalance); 
 router.post("/recipetReport", auth, getRecipetReport);
 
 router.post("/vocherNumber", auth, getVocherNumber);

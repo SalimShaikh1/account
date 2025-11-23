@@ -705,7 +705,7 @@ exports.getRecipetReport = async (req) => {
 
 }
 
-exports.getBalance = async (req) => {
+exports.getBalance = async (req) => { 
     try {
         const perviousQuery = { type: 'Receipt' }
         const currentQuery = { type: 'Receipt' }

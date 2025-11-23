@@ -103,7 +103,7 @@ exports.getRecipetReport = async (req, res) => {
   }
 }
 
-exports.getBalance = async (req, res) => {
+exports.getBalance = async (req, res) => { 
   try {
     const report = await transactionQ.getBalance(req.body);
     return sendSuccess(res, "Report fetched successfully", report);
