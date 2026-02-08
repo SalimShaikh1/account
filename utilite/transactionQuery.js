@@ -1,6 +1,7 @@
 const transaction = require("../models/transaction");
 const income = require("../models/income")
 const expense = require("../models/expense");
+const expenseQ = require("./expenseQuery");
 
 exports.getTransactions = async (req) => {
     const { halquaId, unitId, type } = req.query
@@ -468,7 +469,7 @@ exports.getRecipetReport = async (req) => {
 
         if (req.type === 'Receipt') {
 
-            list = await income.find();
+            list = await incomeQ.getExpense({req:{query: {type: 'main'}}});
 
 
             report = await income.aggregate([
@@ -537,7 +538,7 @@ exports.getRecipetReport = async (req) => {
                 }
             ]);
         } else if (req.type === 'Voucher') {
-            list = await expense.find();
+            list = await expenseQ.getExpense;
 
             report = await expense.aggregate([
                 {
@@ -677,6 +678,16 @@ exports.getRecipetReport = async (req) => {
             Dec: 0, Jan: 0, Feb: 0, Mar: 0,
             Total: 0
         };
+
+        console.log(list, "123");
+        console.log(list.filter(item => {
+            return item.expenseId != undefined;
+        }));
+        
+
+        list.filter(item => {
+            return item.expenseId != undefined;
+        })
 
         const result = list.map(item => {
             const match = report.find(bItem => bItem.id === item._id);

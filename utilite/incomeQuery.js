@@ -55,7 +55,16 @@ exports.getIncomes = async (req) => {
 }
 
 exports.getIncomesWithTr = async (req) => {
+    const filter = {};
+    filter.createdBy = req.user.id;
+    console.log(req.user.unitId);
+    
+    // if (halquaId) filter.halquaId = parseInt(halquaId);
+    if (req.user.unitId) filter.unitId = req.user.unitId;
     const incomes = await income.aggregate([
+        {
+            $match: filter
+        },
         {
             $lookup: {
                 'from': 'transactions',
