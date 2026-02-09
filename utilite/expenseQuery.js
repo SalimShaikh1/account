@@ -1,10 +1,15 @@
 const expense = require("../models/expense");
 
 exports.getExpense = async (req) => {
+
+    console.log(req);
+    
+
     const { halquaId, unitId, expenseId, type } = req.query
     const filter = {};
 
-    filter.createdBy = req.user.id;
+    if(req.user) filter.createdBy = req.user.id;
+    
 
     if (halquaId) filter.halquaId = parseInt(halquaId);
     if (unitId) filter.unitId = parseInt(unitId);

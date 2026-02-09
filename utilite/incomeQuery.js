@@ -3,7 +3,7 @@ const income = require("../models/income");
 exports.getIncomes = async (req) => {
     const { halquaId, unitId } = req.query
     const filter = {};
-    filter.createdBy = req.user.id;
+    if (req.user) filter.createdBy = req.user.id;
     if (halquaId) filter.halquaId = parseInt(halquaId);
     if (unitId) filter.unitId = parseInt(unitId);
 

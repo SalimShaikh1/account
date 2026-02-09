@@ -2,6 +2,7 @@ const transaction = require("../models/transaction");
 const income = require("../models/income")
 const expense = require("../models/expense");
 const expenseQ = require("./expenseQuery");
+const incomeQ = require("./incomeQuery");
 
 exports.getTransactions = async (req) => {
     const { halquaId, unitId, type } = req.query
@@ -468,8 +469,9 @@ exports.getRecipetReport = async (req) => {
         var report;
 
         if (req.type === 'Receipt') {
+            req.query = { unitId : req.unitId };
 
-            list = await incomeQ.getExpense({req:{query: {type: 'main'}}});
+            list = await incomeQ.getIncomes(req);
 
 
             report = await income.aggregate([
@@ -538,7 +540,9 @@ exports.getRecipetReport = async (req) => {
                 }
             ]);
         } else if (req.type === 'Voucher') {
-            list = await expenseQ.getExpense;
+            req.query = { type: 'main' };
+
+            list = await expenseQ.getExpense(req);
 
             report = await expense.aggregate([
                 {
@@ -605,6 +609,9 @@ exports.getRecipetReport = async (req) => {
                     }
                 }
             ]);
+
+            console.log(list, 'sdffsdf');
+
 
         } else {
 
@@ -683,7 +690,7 @@ exports.getRecipetReport = async (req) => {
         console.log(list.filter(item => {
             return item.expenseId != undefined;
         }));
-        
+
 
         list.filter(item => {
             return item.expenseId != undefined;
@@ -716,7 +723,7 @@ exports.getRecipetReport = async (req) => {
 
 }
 
-exports.getBalance = async (req) => { 
+exports.getBalance = async (req) => {
     try {
         const perviousQuery = { type: 'Receipt' }
         const currentQuery = { type: 'Receipt' }
