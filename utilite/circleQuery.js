@@ -1,14 +1,29 @@
 const circle = require("../models/circle");
 
 exports.getCircle = async (req) => {
-    const { halquaId, unitId } = req.query
+    const { halquaId, unitId, type } = req.query
     const filter = {};
 
-    if (halquaId) filter.halquaId = parseInt(halquaId);
-    if (unitId) filter.unitId = parseInt(unitId);
+    // if (halquaId) filter.halquaId = parseInt(halquaId);
+    // if (unitId) filter.unitId = parseInt(unitId);
     // filter.createdBy = req.user.id;
 
-    //console.log(filter);
+    // console.log(filter);
+
+    if (req.user.role == 'Account') {
+        filter.unitId = parseInt(req.user.unitId);
+    } else if (req.user.role == 'Auditor') {
+        filter.halquaId = parseInt(req.user.halquaId);
+    } else if(req.user.role == 'Admin'){
+    }else{
+        filter._id = null
+    }
+
+    if(type == 'report'){
+        filter.unitId = parseInt(unitId);
+    }
+
+    
     
     const circles = await circle.aggregate([
         {

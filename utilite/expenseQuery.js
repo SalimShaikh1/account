@@ -2,17 +2,20 @@ const expense = require("../models/expense");
 
 exports.getExpense = async (req) => {
 
-    console.log(req);
+    // console.log(req);
     
 
     const { halquaId, unitId, expenseId, type } = req.query
     const filter = {};
 
-    if(req.user) filter.createdBy = req.user.id;
-    
+    // if(req.user) filter.createdBy = req.user.id;
 
-    if (halquaId) filter.halquaId = parseInt(halquaId);
-    if (unitId) filter.unitId = parseInt(unitId);
+    if (req.user.role == 'Circle Cashier' || req.user.role == 'Account') {
+        filter.unitId = parseInt(req.user.unitId);
+    } else if (req.user.role == 'Auditor') {
+        filter.halquaId = parseInt(req.user.halquaId);
+    }
+
     if (expenseId) filter.expenseId = parseInt(expenseId);
 
     if(type == 'main'){

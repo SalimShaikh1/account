@@ -14,7 +14,7 @@ exports.createBalance = async (req, res) => {
 
 exports.getBalance = async (req, res) => {
   try {
-      const report = await balanceQuery.getReport(req.body);
+      const report = await balanceQuery.getReport(req.body, req.user);
       return sendSuccess(res, "Balance fetched successfully", report);
     }
     catch (err) {

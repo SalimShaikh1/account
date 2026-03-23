@@ -35,7 +35,7 @@ exports.createIncome = async (req, res) => {
 
       try {
         const income = await Income.create(req.body);
-        console.log('Inserted:', income);
+        // console.log('Inserted:', income);
         return sendSuccess(res, "Income Added successfully", income);
       } catch (err) {
         if (err.code === 11000) {

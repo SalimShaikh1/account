@@ -1,5 +1,6 @@
 const halqua = require("../models/halqua");
 const Unit = require("../models/unit");
+const Income = require("../models/income");
 const unitQ = require("../utilite/unitQuery");
 const { sendError, sendSuccess } = require("../Middleware/response");
 
@@ -17,6 +18,36 @@ exports.createUnit = async (req, res) => {
     } else {
       req.body["createdBy"] = req.user.id;
       const unit = await Unit.create(req.body);
+
+      // console.log(unit);
+
+      let openingIncome = [
+        {
+          "name": "Zakat Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+        {
+          "name": "Special Donation", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+        {
+          "name": "Sadaqua Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+        {
+          "name": "Fitra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+        {
+          "name": "GIO", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+      ]
+
+      const income = await Income.insertMany(openingIncome)
+
+
+
       res.status(201).json(unit);
       return sendSuccess(res, "Unit Created successfully", unit);
     }

@@ -4,17 +4,25 @@ const expense = require("../models/expense");
 
 
 
-exports.getReport = async (req) => {
+exports.getReport = async (req, user) => {
 
     const transactionDataQuery = {}
 
     // Optional filters
-    if (req.circleId) {
-        transactionDataQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
-    }
+    // if (req.circleId) {
+    //     transactionDataQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
+    // }
 
-    if (req.unitId) {
-        transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+    // if (req.unitId) {
+    //     transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+    // }
+
+    if (user.role == 'Circle Cashier') {
+        transactionDataQuery.circleId = parseInt(user.circleId);
+    } else if (user.role == 'Account') {
+        transactionDataQuery.unitId = parseInt(user.unitId);
+    } else if (user.role == 'Auditor') {
+        transactionDataQuery.halquaId = parseInt(user.halquaId);
     }
 
 

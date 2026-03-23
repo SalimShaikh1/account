@@ -5,15 +5,26 @@ const expenseQ = require("./expenseQuery");
 const incomeQ = require("./incomeQuery");
 
 exports.getTransactions = async (req) => {
-    const { halquaId, unitId, type } = req.query
+    const { type } = req.query
     const filter = {};
 
-    if (halquaId) filter.halquaId = parseInt(halquaId);
-    if (unitId) filter.unitId = parseInt(unitId);
-    if (type) filter.type = type;
-    filter.createdBy = req.user.id;
+    console.log(req.user);
 
-    console.log(filter);
+
+    // if (halquaId) filter.halquaId = parseInt(halquaId);
+    // if (unitId) filter.unitId = parseInt(unitId);
+    // filter.createdBy = req.user.id;
+
+    if (req.user.role == 'Circle Cashier') {
+        filter.unitId = parseInt(req.user.unitId);
+        filter.createdBy = req.user.id;
+    } else if (req.user.role == 'Account') {
+        filter.unitId = parseInt(req.user.unitId);
+    }
+
+    if (type) filter.type = type;
+
+    // console.log(filter);
 
 
     const transactions = await transaction.aggregate([
@@ -151,7 +162,7 @@ exports.getTransactions = async (req) => {
     return transactions;
 }
 
-exports.getReport = async (req) => {
+exports.getReport = async (req, user) => {
 
     const matchQuery = {
         'result.type': 'Receipt',
@@ -180,6 +191,7 @@ exports.getReport = async (req) => {
     }
 
     // Optional filters
+
     if (req.circleId) {
 
         matchQuery['result.circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
@@ -188,11 +200,13 @@ exports.getReport = async (req) => {
         initialQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
     }
 
-    if (req.unitId) {
-        matchQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-        transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-        transactionDataQuery1['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-        initialQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+    if (user.role != 'Admin') {
+        if (req.unitId) {
+            matchQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            transactionDataQuery1['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            initialQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        }
     }
 
     const incomeData = await income.aggregate([
@@ -404,8 +418,8 @@ exports.getReport = async (req) => {
 
 
 
-            console.log((receipt.bankAmount + (receipt1.bankAmount - voucher1.bankAmount)) - voucher.bankAmount, "voucher.bankAmount");
-            console.log((receipt.cashAmount + (receipt1.cashAmount - voucher1.cashAmount)) - voucher.cashAmount);
+            // console.log((receipt.bankAmount + (receipt1.bankAmount - voucher1.bankAmount)) - voucher.bankAmount, "voucher.bankAmount");
+            // console.log((receipt.cashAmount + (receipt1.cashAmount - voucher1.cashAmount)) - voucher.cashAmount);
 
 
 
@@ -421,14 +435,14 @@ exports.getReport = async (req) => {
         console.log(error);
     }
 
-    console.log(transactionData);
+    // console.log(transactionData);
 
 
 
     return { aCount: mergedData, bCount: transactionData, vocherTotal: transactionData.find(item => item._id == 'Voucher'), receiptTotal: transactionData.find(item => item._id == 'Receipt') };
 }
 
-exports.getRecipetReport = async (req) => {
+exports.getRecipetReport = async (req, user) => {
     const matchQuery = {}
 
 
@@ -439,12 +453,23 @@ exports.getRecipetReport = async (req) => {
             $lte: req.endDate
         };
         if (req.circleId) {
-            matchQuery['result.circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
+            matchQuery['result.circleId'] = typeof req.circleId === 'number' ? req.circleId : parseInt(req.circleId);
         }
 
-        if (req.unitId) {
-            matchQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        if (user.role != 'Admin') {
+
+            if (req.unitId) {
+                matchQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+            }
+        } else {
+            if (req.unitId) {
+                matchQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+            }
         }
+
+        console.log(matchQuery);
+        
+
     } else {
         matchQuery['type'] = 'Receipt';
         matchQuery['receiptVoucherDate'] = {
@@ -455,13 +480,18 @@ exports.getRecipetReport = async (req) => {
             matchQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
         }
 
-        if (req.unitId) {
-            matchQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        if (user.role != 'Admin') {
+            if (req.unitId) {
+                matchQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            }
         }
         if (req.incomeId) {
             matchQuery['fromHead'] = typeof req.incomeId == Number ? req.incomeId : parseInt(req.incomeId);
         }
     }
+
+    // console.log(matchQuery, "matchQuerymatchQuery");
+
 
     try {
 
@@ -469,7 +499,8 @@ exports.getRecipetReport = async (req) => {
         var report;
 
         if (req.type === 'Receipt') {
-            req.query = { unitId : req.unitId };
+            req.query = { unitId: req.unitId };
+            req.user = user;
 
             list = await incomeQ.getIncomes(req);
 
@@ -541,7 +572,7 @@ exports.getRecipetReport = async (req) => {
             ]);
         } else if (req.type === 'Voucher') {
             req.query = { type: 'main' };
-
+            req.user = user;
             list = await expenseQ.getExpense(req);
 
             report = await expense.aggregate([
@@ -610,12 +641,12 @@ exports.getRecipetReport = async (req) => {
                 }
             ]);
 
-            console.log(list, 'sdffsdf');
+            // console.log(list, 'sdffsdf');
 
 
         } else {
 
-            console.log(matchQuery);
+            // console.log(matchQuery);
             let filterKey = req.type == 'Rukn' ? '$name' : '$collected';
 
             list = await transaction.aggregate([
@@ -670,7 +701,7 @@ exports.getRecipetReport = async (req) => {
                 }
             ])
 
-            console.log(list);
+            // console.log(list);
 
 
             return list;
@@ -686,10 +717,10 @@ exports.getRecipetReport = async (req) => {
             Total: 0
         };
 
-        console.log(list, "123");
-        console.log(list.filter(item => {
-            return item.expenseId != undefined;
-        }));
+        // console.log(list, "123");
+        // console.log(list.filter(item => {
+        //     return item.expenseId != undefined;
+        // }));
 
 
         list.filter(item => {
@@ -743,16 +774,21 @@ exports.getBalance = async (req) => {
         };
 
         if (req.circleId) {
-            perviousQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
-            currentQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
-            tillQuery['result.circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
+            perviousQuery['circleId'] = typeof req.circleId === 'number' ? req.circleId : parseInt(req.circleId);
+            currentQuery['circleId'] = typeof req.circleId === 'number' ? req.circleId : parseInt(req.circleId);
+            tillQuery['result.circleId'] = typeof req.circleId === 'number' ? req.circleId : parseInt(req.circleId);
         }
 
         if (req.unitId) {
-            perviousQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-            currentQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-            tillQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+            perviousQuery['unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+            currentQuery['unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+            tillQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
         }
+
+        console.log(perviousQuery);
+        console.log(currentQuery);
+        console.log(tillQuery);
+
 
 
         let pervious = await transaction.aggregate([

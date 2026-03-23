@@ -85,7 +85,7 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.getReport = async (req, res) => {
   try {
-    const report = await transactionQ.getReport(req.body);
+    const report = await transactionQ.getReport(req.body, req.user);
     return sendSuccess(res, "Report fetched successfully", report);
   }
   catch (err) {
@@ -94,8 +94,12 @@ exports.getReport = async (req, res) => {
 };
 
 exports.getRecipetReport = async (req, res) => {
+
+  // console.log(req);
+  
+
   try {
-    const report = await transactionQ.getRecipetReport(req.body);
+    const report = await transactionQ.getRecipetReport(req.body, req.user);
     return sendSuccess(res, "Report fetched successfully", report);
   }
   catch (err) {

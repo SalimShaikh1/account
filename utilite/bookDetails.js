@@ -15,7 +15,7 @@ exports.genrateVocherNumber = async (data) => {
         if (book.currentNumber === book.endNumber) {
             return { message: 'Book is full' }
         }
-        console.log(book);
+        // console.log(book);
         
         // return `${circleName.name.slice(0, 3).toUpperCase()}${unitName.name.slice(0, 3).toUpperCase()}${halquaName.name.slice(0, 3).toUpperCase()}${new Date().getFullYear()}${book.currentNumber == 0 ? book.startNumber : book.currentNumber+1}`
         return `${book.currentNumber == 0 ? book.startNumber : book.currentNumber+1}`
@@ -33,28 +33,40 @@ exports.updateBook = async (data) => {
 
 exports.updateVoucher = async (data) => {
 
-      console.log(data.circleId);
+    //   console.log(data.circleId);
 
 
     var circle = await Circle.findOne({ _id: data.circleId });
     
     circle.currentVocher = circle.currentVocher + 1;
-    console.log(circle);
+    // console.log(circle);
 
     circle.save();
 }
 
 
 exports.getBooks = async (req) => {
-    const { halquaId, unitId } = req.query
+
+    // console.log(req.query);
+    // console.log(req.user, "user");
+    
+
+    const { halquaId, unitId, circleId } = req.user
     const filter = {};
 
-    if (halquaId) filter.halquaId = parseInt(halquaId);
-    if (unitId) filter.unitId = parseInt(unitId);
+    if (req.user.role == 'Circle Cashier') {
+        filter.circleId = parseInt(req.user.circleId);
+    } else if (req.user.role == 'Account') {
+        filter.unitId = parseInt(req.user.unitId);
+    } else if (req.user.role == 'Auditor') {
+        filter.halquaId = parseInt(req.user.halquaId);
+    }
 
-    filter.createdBy = req.user.id;
 
-    //console.log(filter);
+
+    // filter.createdBy = req.user.id;
+
+    // console.log(filter, "sdfsdf");
 
     const books = await Book.aggregate([
         {

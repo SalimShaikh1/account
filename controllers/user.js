@@ -68,8 +68,8 @@ exports.login = async (req, res) => {
       return sendError(res, "Invalid contact or password", [], 401);
     }
 
-    const userData = await userQ.getUserData({ id: user._id, halquaId: user.halquaId, unitId: user.unitId, circleId: user.circleId})
-    console.log(userData);
+    const userData = await userQ.getUserData({ id: user._id, halquaId: user.halquaId, unitId: user.unitId, circleId: user.circleId, roleId: user.roleId})
+    // console.log(userData);
     
     const token = jwt.sign(userData, process.env.JWT_SECRET, {
       expiresIn: "1d",

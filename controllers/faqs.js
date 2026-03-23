@@ -23,7 +23,7 @@ exports.createFaq = async (req, res) => {
 
 // Read All
 exports.getFaqs = async (req, res) => {
-  console.log('test calling');
+  // console.log('test calling');
   
   try {
     const books = await FaqQ.getFaq(req);

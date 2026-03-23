@@ -1,13 +1,24 @@
 const income = require("../models/income");
 
 exports.getIncomes = async (req) => {
-    const { halquaId, unitId } = req.query
+    const { halquaId, unitId, circleId } = req.query
     const filter = {};
-    if (req.user) filter.createdBy = req.user.id;
-    if (halquaId) filter.halquaId = parseInt(halquaId);
-    if (unitId) filter.unitId = parseInt(unitId);
 
-    //console.log(filter);
+    // if (req.user) filter.createdBy = req.user.id;
+
+
+    console.log(unitId);
+
+
+    if (req.user.role == 'Circle Cashier' || req.user.role == 'Account') {
+        filter.unitId = parseInt(req.user.unitId);
+    } else if (req.user.role == 'Auditor') {
+        filter.halquaId = parseInt(req.user.halquaId);
+    }else if (req.user.role == 'Admin') {
+        if (unitId) filter.unitId = parseInt(unitId);
+    }
+
+    console.log(filter, 123);
 
     const incomes = await income.aggregate([
         {
@@ -56,9 +67,9 @@ exports.getIncomes = async (req) => {
 
 exports.getIncomesWithTr = async (req) => {
     const filter = {};
-    filter.createdBy = req.user.id;
-    console.log(req.user.unitId);
-    
+    // filter.createdBy = req.user.id;
+    // console.log(req.user.unitId);
+
     // if (halquaId) filter.halquaId = parseInt(halquaId);
     if (req.user.unitId) filter.unitId = req.user.unitId;
     const incomes = await income.aggregate([
@@ -91,9 +102,9 @@ exports.getIncomesWithTr = async (req) => {
                     }
                 ]
             }
-        },{
-            $project:{
-                transactions:0
+        }, {
+            $project: {
+                transactions: 0
             }
         }
     ])

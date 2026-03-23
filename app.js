@@ -38,5 +38,5 @@ app.use("/api/faq", faqRoutes);
 app.use("/api/balance", balanceRoutes);
 
 app.listen(PORT, () => {
-  // console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

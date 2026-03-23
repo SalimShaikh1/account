@@ -2,6 +2,7 @@ const user = require("../models/user");
 const halqua = require("../models/halqua");
 const unit = require("../models/unit");
 const circle = require("../models/circle");
+const role = require("../models/role");
 
 exports.getUsers = async (req) => {
     const { halquaId, unitId } = req.query
@@ -92,9 +93,13 @@ exports.getUserData = async (req) => {
     const halquaData = await halqua.findById(id = req.halquaId)
     const unitData = await unit.findById(id = req.unitId)
     const circleData = await circle.findById(id = req.circleId)
+    const roleData = await role.findById(id = req.roleId)
+    const userData = await user.findById(id = req.id)
 
-    req['halquaName'] = halquaData.name
-    req['unitName'] = unitData.name
-    req['circleName'] = circleData.name
+    req['halquaName'] = halquaData?.name
+    req['unitName'] = unitData?.name
+    req['circleName'] = circleData?.name
+    req['role'] = roleData?.role
+    req['name'] = `${userData?.firstName} ${userData?.middleName} ${userData?.lastName}` 
     return req
 }
