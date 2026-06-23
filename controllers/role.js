@@ -3,6 +3,10 @@ const { sendError, sendSuccess } = require("../Middleware/response");
 
 // Create
 exports.createRole = async (req, res) => {
+
+  console.log(req.user);
+  
+
   try {
     if (req.body._id) {
       req.body["modifiedOn"] = Date.now();

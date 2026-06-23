@@ -13,6 +13,7 @@ const userRoutes = require("./routes/user");
 const transactionRoutes = require("./routes/transaction");
 const faqRoutes = require("./routes/faq");
 const balanceRoutes = require("./routes/balance");
+const auditorRoutes = require("./routes/auditor");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/transaction", transactionRoutes);
 app.use("/api/faq", faqRoutes);
 app.use("/api/balance", balanceRoutes);
+app.use("/api/auditor", auditorRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

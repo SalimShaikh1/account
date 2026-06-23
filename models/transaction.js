@@ -24,11 +24,26 @@ const transactionSchema = new mongoose.Schema({
   cityShare: Number,
   unitShare: Number,
   halquaShare: Number,
-  audited: Boolean,
-  auditedStatus: String,
-  auditedBy: String,
-  auditedOn: String,
-  auditedRemark: String,
+  audited: {
+  type: Boolean,
+  default: false
+},
+  auditedStatus: {
+  type: String,
+  default: "Pending"
+},
+  auditedBy: {
+  type: Number,
+  default: null
+},
+  auditedOn: {
+  type: Date,
+  default: null
+},
+  auditedRemark: {
+  type: String,
+  default: ""
+},
   fromHead:Number,
   type:String,
   createdBy: Number,

@@ -5,7 +5,7 @@ const expenseQ = require("./expenseQuery");
 const incomeQ = require("./incomeQuery");
 
 exports.getTransactions = async (req) => {
-    const { type } = req.query
+    const { type,unitId } = req.query
     const filter = {};
 
     console.log(req.user);
@@ -20,6 +20,8 @@ exports.getTransactions = async (req) => {
         filter.createdBy = req.user.id;
     } else if (req.user.role == 'Account') {
         filter.unitId = parseInt(req.user.unitId);
+    } else if (req.user.role == 'Auditor') {
+        filter.unitId = parseInt(unitId);
     }
 
     if (type) filter.type = type;

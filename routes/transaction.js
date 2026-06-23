@@ -4,6 +4,7 @@ const router = express.Router();
 const multer = require('multer');
 const { createTransaction, getTransaction, deleteTransaction, getVocherNumber, getReport, getRecipetReport, getBalance } = require("../controllers/transaction");
 const auth = require("../Middleware/authMiddleware");
+const { updateAuditStatus } = require("../controllers/auditController");
 
 
 const storage = multer.diskStorage({
@@ -26,5 +27,7 @@ router.post("/getBalance", auth, getBalance);
 router.post("/recipetReport", auth, getRecipetReport);
 
 router.post("/vocherNumber", auth, getVocherNumber);
+
+router.post("/updateAuditStatus", auth, updateAuditStatus);
 
 module.exports = router;
