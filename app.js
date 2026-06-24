@@ -14,6 +14,7 @@ const transactionRoutes = require("./routes/transaction");
 const faqRoutes = require("./routes/faq");
 const balanceRoutes = require("./routes/balance");
 const auditorRoutes = require("./routes/auditor");
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,7 +25,11 @@ app.use(express.json());
 
 // Connect DB
 connectDB();
-app.use('/uploads', express.static('uploads'));
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use("/api/roles", roleRoutes);
 app.use("/api/halqua", halquaRoutes);
