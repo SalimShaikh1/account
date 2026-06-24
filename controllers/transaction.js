@@ -11,6 +11,7 @@ exports.createTransaction = async (req, res) => {
     if (req.body._id) {
       req.body["modifiedOn"] = Date.now();
       req.body["modifiedBy"] = req.user.id;
+      console.log("File:", req.file);
       if (req.file) {
         req.body["imagesPath"] = req.file.filename;
       }
