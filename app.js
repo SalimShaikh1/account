@@ -15,6 +15,7 @@ const faqRoutes = require("./routes/faq");
 const balanceRoutes = require("./routes/balance");
 const auditorRoutes = require("./routes/auditor");
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
