@@ -44,7 +44,7 @@ exports.createUnit = async (req, res) => {
         },
       ]
 
-      const income = await Income.insertMany(openingIncome)
+      const income = await Income.create(openingIncome)
 
 
 
