@@ -18,6 +18,7 @@ exports.createTransaction = async (req, res) => {
       const transaction = await Transaction.findOneAndUpdate({ _id: req.body._id }, req.body, {
         new: true,
       });
+      await income.divideShare(transaction)
       if (!transaction) return sendError(res, "Transaction not found", [], 401);
       return sendSuccess(res, "transaction Update successfully", transaction);
     } else {
