@@ -30,13 +30,19 @@ exports.createTransaction = async (req, res) => {
       const data = await UserDetilas.getUserData(req.body)
       const transaction = await Transaction.create(data);
 
-      if (data.type == 'Voucher') { 
-        await bookDetails.updateVoucher(transaction)
+      console.log(data);
+
+
+      if (data.name != "Withdraw" && data.name != "Deposit") {
+
+        if (data.type == 'Voucher') {
+          await bookDetails.updateVoucher(transaction)
+        }
+        else {
+          await bookDetails.updateBook(transaction)
+        }
+        await income.divideShare(transaction)
       }
-      else {
-        await bookDetails.updateBook(transaction)
-      }
-      await income.divideShare(transaction)
       return sendSuccess(res, "transaction Added successfully", transaction);
     }
   } catch (err) {
@@ -98,7 +104,7 @@ exports.getReport = async (req, res) => {
 exports.getRecipetReport = async (req, res) => {
 
   // console.log(req);
-  
+
 
   try {
     const report = await transactionQ.getRecipetReport(req.body, req.user);
@@ -109,7 +115,7 @@ exports.getRecipetReport = async (req, res) => {
   }
 }
 
-exports.getBalance = async (req, res) => { 
+exports.getBalance = async (req, res) => {
   try {
     const report = await transactionQ.getBalance(req.body);
     return sendSuccess(res, "Report fetched successfully", report);
