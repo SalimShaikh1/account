@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   middleName: String,
   lastName: String,
   contact: String,
-  roleId: Number,
+  roleIds: [Number],
   halquaId: {type:Number, ref: 'Halqua', required: true},
   unitId: Number,
   circleId: Number,

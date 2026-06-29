@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Role = require("../models/role");
 const userQ = require("../utilite/userQuery");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -7,16 +8,24 @@ const { sendError, sendSuccess } = require("../Middleware/response");
 // Create
 exports.createUser = async (req, res) => {
   try {
+    if (req.body.roleId && !req.body.roleIds) {
+      req.body.roleIds = [req.body.roleId];
+    }
     if (req.body._id) {
-      req.body["modifiedOn"] = Date.now();
-      req.body["modifiedBy"] = req.user.id;
-      const user = await User.findOneAndUpdate({ _id: req.body._id }, req.body, {
+      const update = { ...req.body };
+      delete update._id;
+      update.modifiedOn = Date.now();
+      update.modifiedBy = req.user.id;
+      const user = await User.findOneAndUpdate({ _id: req.body._id }, update, {
         new: true,
       });
       if (!user) return sendError(res, "User not found", [], 401);
       return sendSuccess(res, "User updated successfully", user);
     } else {
       req.body["createdBy"] = req.user.id;
+
+      console.log(req.body);
+      
       const user = await User.create(req.body);
       return sendSuccess(res, "User created successfully", user);
     }
@@ -53,7 +62,7 @@ exports.deleteUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const { contact, password } = req.body;
+  const { contact, password, roleId } = req.body;
 
   if (!contact || !password) {
     return res
@@ -68,8 +77,36 @@ exports.login = async (req, res) => {
       return sendError(res, "Invalid contact or password", [], 401);
     }
 
-    const userData = await userQ.getUserData({ id: user._id, halquaId: user.halquaId, unitId: user.unitId, circleId: user.circleId, roleId: user.roleId})
-    // console.log(userData);
+    const roles = await Role.find({ _id: { $in: user.roleIds } });
+
+    const userRole = roles.find(r => r.role.toLowerCase() === "user")
+    if (userRole) {
+      return sendError(res, "You are not authorized to login", [], 403);
+    }
+
+    console.log(user);
+    
+
+    if (!user.roleIds || user.roleIds.length === 0) {
+      return sendError(res, "No role assigned. Contact admin.", [], 403);
+    }
+
+    if (user.roleIds.length > 1 && !roleId) {
+      const availableRoles = roles.map(r => ({ _id: r._id, role: r.role }));
+      return res.status(200).json({
+        success: true,
+        message: "Multiple roles found. Select a role to login.",
+        data: { userId: user._id, roles: availableRoles }
+      });
+    }
+
+    const selectedRoleId = user.roleIds.length === 1 ? user.roleIds[0] : roleId;
+
+    if (!user.roleIds.includes(selectedRoleId)) {
+      return sendError(res, "Invalid role selected", [], 400);
+    }
+
+    const userData = await userQ.getUserData({ id: user._id, halquaId: user.halquaId, unitId: user.unitId, circleId: user.circleId, roleId: selectedRoleId })
     
     const token = jwt.sign(userData, process.env.JWT_SECRET, {
       expiresIn: "1d",

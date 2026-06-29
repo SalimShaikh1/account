@@ -44,7 +44,7 @@ exports.getUsers = async (req) => {
         {
             $lookup: {
                 from: "roles",
-                localField: "roleId",
+                localField: "roleIds",
                 foreignField: "_id",
                 as: "role",
             }
@@ -65,16 +65,11 @@ exports.getUsers = async (req) => {
             }
         },
         {
-            $unwind: {
-                path: "$role",
-            }
-        },
-        {
             $addFields: {
                 halquaName: "$halqua.name",
                 unitName: "$unit.name",
                 circleName: "$circle.name",
-                roleName: "$role.role",
+                roleNames: "$role.role",
             }
         },
         {

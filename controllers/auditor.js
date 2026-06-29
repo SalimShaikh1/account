@@ -23,7 +23,7 @@ exports.createAuditor = async (req, res) => {
             // Create New Auditor
             const auditorSave = await auditor.create(req.body);
 
-            const userData = await user.updateOne({_id : req.body.userId}, { $set: { roleId: req.body.roleId }})
+            const userData = await user.updateOne({_id : req.body.userId}, { $addToSet: { roleIds: req.body.roleId }})
 
             return res.status(201).json(auditorSave);
         } else {
