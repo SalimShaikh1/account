@@ -6,6 +6,15 @@ const { sendError, sendSuccess } = require("../Middleware/response");
 // Create
 exports.createBook = async (req, res) => {
   try {
+    const existingBook = await Book.findOne({
+      bookNumber: req.body.bookNumber,
+      _id: { $ne: req.body._id || null }
+    });
+
+    if (existingBook) {
+      return sendError(res, "Book number already exists", [], 400);
+    }
+
     if (req.body._id) {
       req.body["modifiedOn"] = Date.now();
       req.body["modifiedBy"] = req.user.id;

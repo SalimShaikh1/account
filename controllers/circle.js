@@ -5,6 +5,18 @@ const { sendError, sendSuccess } = require("../Middleware/response");
 // Create
 exports.createCircle = async (req, res) => {
   try {
+    const duplicate = await Circle.findOne({
+      name: { $regex: new RegExp(`^${req.body.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      unitId: req.body.unitId,
+      halquaId: req.body.halquaId,
+      isDeleted: { $ne: true },
+      _id: { $ne: req.body._id || null }
+    });
+
+    if (duplicate) {
+      return sendError(res, `Circle "${req.body.name}" already exists in this Unit`, [], 400);
+    }
+
     if (req.body._id) {
       req.body["modifiedOn"] = Date.now();
       req.body["modifiedBy"] = req.user.id;

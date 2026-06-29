@@ -4,6 +4,16 @@ const { sendError, sendSuccess } = require("../Middleware/response");
 // Create
 exports.createHalqua = async (req, res) => {
   try {
+    const duplicate = await Halqua.findOne({
+      name: { $regex: new RegExp(`^${req.body.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      isDeleted: { $ne: true },
+      _id: { $ne: req.body._id || null }
+    });
+
+    if (duplicate) {
+      return sendError(res, `Halqua "${req.body.name}" already exists`, [], 400);
+    }
+
     if (req.body._id) {
       req.body["modifiedOn"] = Date.now();
       req.body["modifiedBy"] = req.user.id;
