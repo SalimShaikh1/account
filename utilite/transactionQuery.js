@@ -5,7 +5,7 @@ const expenseQ = require("./expenseQuery");
 const incomeQ = require("./incomeQuery");
 
 exports.getTransactions = async (req) => {
-    const { type,unitId } = req.query
+    const { type, unitId } = req.query
     const filter = {};
 
     console.log(req.user);
@@ -172,6 +172,12 @@ exports.getReport = async (req, user) => {
         'result.receiptVoucherDate': {
             $gte: req.startDate,
             $lte: req.endDate
+        },
+        'name': {
+            $ne: "Contra"
+        },
+        'expenseMain': {
+            $ne: "Contra"
         }
     };
 
@@ -251,6 +257,11 @@ exports.getReport = async (req, user) => {
             }
         }
     ])
+
+
+    // incomeData.filter((item) => item.receiptName != "Contra");
+    // console.log(incomeData);
+
 
     matchQuery['result.type'] = 'Voucher';
     matchQuery['expenseId'] = { $exists: false };
@@ -445,7 +456,17 @@ exports.getReport = async (req, user) => {
 }
 
 exports.getRecipetReport = async (req, user) => {
-    const matchQuery = {}
+    const matchQuery = {
+        'name': {
+            $ne: "Contra"
+        },
+        'expenseMain': {
+            $ne: "Contra"
+        },
+        'receiptVoucherNo': {
+            $ne: "Contra"
+        },
+    }
 
 
     if (req.type === 'Receipt' || req.type === 'Voucher') {
@@ -470,7 +491,7 @@ exports.getRecipetReport = async (req, user) => {
         }
 
         console.log(matchQuery);
-        
+
 
     } else {
         matchQuery['type'] = 'Receipt';
@@ -501,7 +522,7 @@ exports.getRecipetReport = async (req, user) => {
         var report;
 
         if (req.type === 'Receipt') {
-            req.query = { unitId: req.unitId };
+            req.query = { unitId: req.unitId, name: { $ne: 'Contra' } };
             req.user = user;
 
             list = await incomeQ.getIncomes(req);
@@ -758,9 +779,21 @@ exports.getRecipetReport = async (req, user) => {
 
 exports.getBalance = async (req) => {
     try {
-        const perviousQuery = { type: 'Receipt' }
-        const currentQuery = { type: 'Receipt' }
-        const tillQuery = {}
+        const perviousQuery = {
+            type: 'Receipt', receiptVoucherNo: {
+                $ne: "Contra"
+            }
+        }
+        const currentQuery = {
+            type: 'Receipt', receiptVoucherNo: {
+                $ne: "Contra"
+            }
+        }
+        const tillQuery = {
+            'expenseMain': {
+                $ne: "Contra"
+            }
+        }
         tillQuery['result.type'] = 'Voucher';
 
         perviousQuery['receiptVoucherDate'] = {
@@ -799,10 +832,6 @@ exports.getBalance = async (req) => {
             },
             {
                 $group:
-                /**
-                 * _id: The id of the group.
-                 * fieldN: The first field name.
-                 */
                 {
                     _id: "$type",
                     totalAmount: {
@@ -960,4 +989,16 @@ exports.getBalance = async (req) => {
         console.log(err);
 
     }
+}
+
+exports.setIds = async (req) => {
+    var incomeDetails = await income.findOne({ unitId: req.unitId, name: 'Contra' });
+    var expenseDetails = await expense.findOne({ unitId: req.unitId, expenseMain: 'Contra' });
+    var subExpenseDetails = await expense.findOne({ unitId: req.unitId, expenseSub: 'Contra' });
+
+    req.fromHead = incomeDetails._id;
+    req.head = expenseDetails._id;
+    req.subHead = subExpenseDetails._id;
+
+    req.save();
 }

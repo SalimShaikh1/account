@@ -43,6 +43,9 @@ exports.createTransaction = async (req, res) => {
         }
         await income.divideShare(transaction)
       }
+      else{
+        await transactionQ.setIds(transaction)
+      }
       return sendSuccess(res, "transaction Added successfully", transaction);
     }
   } catch (err) {

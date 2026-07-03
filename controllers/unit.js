@@ -1,6 +1,7 @@
 const halqua = require("../models/halqua");
 const Unit = require("../models/unit");
 const Income = require("../models/income");
+const Expense = require("../models/expense");
 const unitQ = require("../utilite/unitQuery");
 const { sendError, sendSuccess } = require("../Middleware/response");
 
@@ -53,10 +54,30 @@ exports.createUnit = async (req, res) => {
           "name": "GIO", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
           "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
         },
+        {
+          "name": "Contra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        }
+      ]
+
+      let openingExpense = [
+        {
+          "expenseMain": "Contra", "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        }
       ]
 
       const income = await Income.create(openingIncome)
+      const expense = await Expense.create(openingExpense)
 
+      let openingSubExpense = [
+        {
+          "expenseMain": "Contra", "expenseSub": "Contra", "expenseId":expense._id, "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        }
+      ]
+
+      const subExpense = await Expense.create(openingSubExpense)
 
 
       res.status(201).json(unit);

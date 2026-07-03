@@ -2,7 +2,11 @@ const income = require("../models/income");
 
 exports.getIncomes = async (req) => {
     const { halquaId, unitId, circleId } = req.query
-    const filter = {};
+    const filter = {
+        'name': {
+            $ne: "Contra"
+        }
+    };
 
     // if (req.user) filter.createdBy = req.user.id;
 

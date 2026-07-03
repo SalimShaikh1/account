@@ -3,10 +3,14 @@ const expense = require("../models/expense");
 exports.getExpense = async (req) => {
 
     // console.log(req);
-    
+
 
     const { halquaId, unitId, expenseId, type } = req.query
-    const filter = {};
+    const filter = {
+        'expenseMain': {
+            $ne: "Contra"
+        }
+    };
 
     // if(req.user) filter.createdBy = req.user.id;
 
@@ -18,15 +22,15 @@ exports.getExpense = async (req) => {
 
     if (expenseId) filter.expenseId = parseInt(expenseId);
 
-    if(type == 'main'){
+    if (type == 'main') {
         filter.expenseId = { $exists: false }
     }
 
     //console.log(filter);
-    
+
     const expenses = await expense.aggregate([
         {
-            $match:filter
+            $match: filter
         },
         {
             $lookup: {
@@ -48,7 +52,7 @@ exports.getExpense = async (req) => {
             $unwind: {
                 path: "$halqua",
             }
-        },{
+        }, {
             $unwind: {
                 path: "$unit",
             }
