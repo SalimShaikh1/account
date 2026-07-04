@@ -10,25 +10,37 @@ exports.getCircle = async (req) => {
 
     // console.log(filter);
 
-    if (req.user.role == 'Account') {
-        filter.unitId = parseInt(req.user.unitId);
-    } else if (req.user.role == 'Auditor') {
-        filter.halquaId = parseInt(req.user.halquaId);
-    } else if(req.user.role == 'Admin' && unitId != ''){
-        filter.unitId = parseInt(unitId);
-    }else{
-        filter._id = null
+    try {
+
+        if (req.user.role == 'Account') {
+            filter.unitId = parseInt(req.user.unitId);
+        } else if (req.user.role == 'Auditor') {
+            filter.halquaId = parseInt(req.user.halquaId);
+        } else if (req.user.role == 'Admin' && unitId) {
+            filter.unitId = parseInt(unitId);
+            console.log(unitId == '', 'unitId');
+            console.log(unitId == ' ', 'unitId');
+            console.log(!unitId, 'unitId');
+
+
+        }
+        // else{
+        //     filter._id = null
+        // }
+
+        if (type == 'report') {
+            filter.unitId = parseInt(unitId);
+        }
+
+    } catch (err) {
+        console.log(err);
+
     }
 
-    if(type == 'report'){
-        filter.unitId = parseInt(unitId);
-    }
 
-    
-    
     const circles = await circle.aggregate([
         {
-            $match:filter
+            $match: filter
         },
         {
             $lookup: {
@@ -50,7 +62,7 @@ exports.getCircle = async (req) => {
             $unwind: {
                 path: "$halqua",
             }
-        },{
+        }, {
             $unwind: {
                 path: "$unit",
             }
