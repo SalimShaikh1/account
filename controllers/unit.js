@@ -40,7 +40,7 @@ exports.createUnit = async (req, res) => {
         },
         {
           "name": "Special Donation", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": false
         },
         {
           "name": "Sadaqua Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
@@ -48,11 +48,11 @@ exports.createUnit = async (req, res) => {
         },
         {
           "name": "Fitra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": false
         },
         {
           "name": "GIO", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": false
         },
         {
           "name": "Contra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,

@@ -70,7 +70,11 @@ exports.getIncomes = async (req) => {
 }
 
 exports.getIncomesWithTr = async (req) => {
-    const filter = {};
+    const filter = {
+        'name': {
+            $ne: "Contra"
+        }
+    };
     // filter.createdBy = req.user.id;
     // console.log(req.user.unitId);
 

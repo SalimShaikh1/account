@@ -6,7 +6,9 @@ const expense = require("../models/expense");
 
 exports.getReport = async (req, user) => {
 
-    const transactionDataQuery = {}
+    const transactionDataQuery = {'receiptVoucherNo': {
+            $ne: "Contra"
+        }}
 
     // Optional filters
     // if (req.circleId) {
