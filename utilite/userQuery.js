@@ -10,7 +10,10 @@ exports.getUsers = async (req) => {
 
     if (halquaId) filter.halquaId = parseInt(halquaId);
     if (unitId) filter.unitId = parseInt(unitId);
-    filter.createdBy = req.user.id;
+
+    if (req.user.role != 'Admin') {
+        filter.createdBy = req.user.id;
+    }
     //console.log(filter);
 
     const users = await user.aggregate([
@@ -95,6 +98,6 @@ exports.getUserData = async (req) => {
     req['unitName'] = unitData?.name
     req['circleName'] = circleData?.name
     req['role'] = roleData?.role
-    req['name'] = `${userData?.firstName} ${userData?.middleName} ${userData?.lastName}` 
+    req['name'] = `${userData?.firstName} ${userData?.middleName} ${userData?.lastName}`
     return req
 }
