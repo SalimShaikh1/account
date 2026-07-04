@@ -15,6 +15,7 @@ exports.getCircle = async (req) => {
     } else if (req.user.role == 'Auditor') {
         filter.halquaId = parseInt(req.user.halquaId);
     } else if(req.user.role == 'Admin'){
+        filter.unitId = parseInt(req.user.unitId);
     }else{
         filter._id = null
     }
