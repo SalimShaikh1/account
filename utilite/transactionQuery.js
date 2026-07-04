@@ -797,7 +797,7 @@ exports.getBalance = async (req) => {
         tillQuery['result.type'] = 'Voucher';
 
         perviousQuery['receiptVoucherDate'] = {
-            $lte: req.startDate
+            $lt: req.startDate
         };
         currentQuery['receiptVoucherDate'] = {
             $gte: req.startDate,
