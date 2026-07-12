@@ -38,7 +38,17 @@ exports.createUser = async (req, res) => {
 exports.getUsers = async (req, res) => {
   try {
     
-    const users = await userQ.getUsers(req);
+    const user = await userQ.getUsers(req);
+    return sendSuccess(res, "User fetched successfully", user);
+  } catch (err) {
+    return sendError(res, "Server error", [err.message], 500);
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    
+    const users = await User.findOne({_id : req.user.id});
     return sendSuccess(res, "User fetched successfully", users);
   } catch (err) {
     return sendError(res, "Server error", [err.message], 500);
@@ -77,21 +87,25 @@ exports.login = async (req, res) => {
       return sendError(res, "Invalid contact or password", [], 401);
     }
 
-    const roles = await Role.find({ _id: { $in: user.roleIds } });
+    let roles = await Role.find({ _id: { $in: user.roleIds } });
 
     const userRole = roles.find(r => r.role.toLowerCase() === "user")
-    if (userRole) {
+
+    if (userRole && roles.length === 1) {
       return sendError(res, "You are not authorized to login", [], 403);
     }
 
-    console.log(user);
-    
+    const otherRoles = userRole ? roles.filter(r => r.role.toLowerCase() !== "user") : roles;
 
-    if (!user.roleIds || user.roleIds.length === 0) {
+    if (otherRoles.length > 0 && otherRoles.length !== roles.length) {
+      roles = otherRoles;
+    }
+
+    if (!roles || roles.length === 0) {
       return sendError(res, "No role assigned. Contact admin.", [], 403);
     }
 
-    if (user.roleIds.length > 1 && !roleId) {
+    if (roles.length > 1 && !roleId) {
       const availableRoles = roles.map(r => ({ _id: r._id, role: r.role }));
       return res.status(200).json({
         success: true,
@@ -100,9 +114,9 @@ exports.login = async (req, res) => {
       });
     }
 
-    const selectedRoleId = user.roleIds.length === 1 ? user.roleIds[0] : roleId;
+    const selectedRoleId = roles.length === 1 ? roles[0]._id : roleId;
 
-    if (!user.roleIds.includes(selectedRoleId)) {
+    if (!roles.some(r => r._id === parseInt(selectedRoleId))) {
       return sendError(res, "Invalid role selected", [], 400);
     }
 
