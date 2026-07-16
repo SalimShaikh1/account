@@ -1,0 +1,80 @@
+Create a Mongoose model, Express routes, and controller for a dynamic permission system in my existing Node.js backend. The frontend Angular app already has a PermissionService that fetches from GET /api/permissions and saves via PUT /api/permissions.
+
+First, explore the existing project structure to understand the patterns used (look at existing models in a models/ folder, existing routes in routes/, and how they're registered in the main server file).
+
+Then implement:
+
+1. **Model** - `models/Permission.js` with fields: menuPermissions (Object), pagePermissions (Object), actionPermissions (Object), formFieldPermissions (Object), timestamps
+
+2. **Routes** - `routes/permissions.js` with:
+   - `GET /api/permissions` - returns the single permissions document. If none exists, create one with the default data below and return it. Response: `{ success: true, data: <doc> }`
+   - `PUT /api/permissions` - accepts full permission object in body, upserts, returns updated doc. Response: `{ success: true, data: <doc> }`
+
+3. **Register** the route in the main server file following the existing pattern.
+
+Use the exact same patterns as existing models/routes (error handling, response format, imports).
+
+Default data to seed when GET returns nothing:
+
+```json
+{
+  "menuPermissions": {
+    "Dashboard": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "Receipt": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "Contra": ["Circle Cashier"],
+    "Voucher": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "Report": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "Masters": ["Admin", "Account"],
+    "Halqua": ["Admin"],
+    "Unit": ["Admin"],
+    "Circle": ["Admin", "Account"],
+    "Income": ["Admin", "Account"],
+    "Expense": ["Admin", "Account"],
+    "Books": ["Admin", "Account"],
+    "User": ["Admin", "Account"],
+    "Auditor": ["Admin"],
+    "Role": ["Admin"],
+    "FAQ": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "Profile": ["Admin", "Account", "Circle Cashier", "Auditor"]
+  },
+  "pagePermissions": {
+    "home": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "receipt": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "contra": ["Circle Cashier"],
+    "voucher": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "report": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "halqua": ["Admin"],
+    "unit": ["Admin"],
+    "circle": ["Admin", "Account"],
+    "income": ["Admin", "Account"],
+    "expense": ["Admin", "Account"],
+    "book": ["Admin", "Account"],
+    "user": ["Admin", "Account"],
+    "auditor": ["Admin"],
+    "role": ["Admin"],
+    "faq": ["Admin", "Account", "Circle Cashier", "Auditor"],
+    "profile": ["Admin", "Account", "Circle Cashier", "Auditor"]
+  },
+  "actionPermissions": {
+    "table": {
+      "edit": ["Admin", "Account", "Circle Cashier", "Auditor"],
+      "delete": ["Admin"],
+      "audit": ["Auditor"],
+      "view": ["Admin", "Account", "Circle Cashier", "Auditor"],
+      "toggle": ["Admin"],
+      "share": ["Admin", "Account", "Circle Cashier", "Auditor"]
+    },
+    "Receipt": { "edit": ["Admin", "Circle Cashier", "Auditor"] },
+    "Voucher": { "edit": ["Admin", "Circle Cashier", "Auditor"] }
+  },
+  "formFieldPermissions": {
+    "circle": { "halquaId": ["Admin"], "unitId": ["Admin"] },
+    "income": { "halquaId": ["Admin"], "unitId": ["Admin"] },
+    "expense": { "halquaId": ["Admin"], "unitId": ["Admin"] },
+    "book": { "halquaId": ["Admin"], "unitId": ["Admin"], "circleId": ["Admin"] },
+    "user": { "halquaId": ["Admin"], "unitId": ["Admin"], "circleId": ["Admin"] }
+  }
+}
+```
+
+Return: the full content of all files created/modified.

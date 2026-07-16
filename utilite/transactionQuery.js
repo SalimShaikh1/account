@@ -209,19 +209,19 @@ exports.getReport = async (req, user) => {
     }
 
     // if (user.role != 'Admin') {
-        if (req.unitId) {
-            matchQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-            transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-            transactionDataQuery1['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-            initialQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-        }
+    if (req.unitId) {
+        matchQuery['result.unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        transactionDataQuery1['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        initialQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+    }
     // }
 
     console.log(matchQuery, "matchQuery");
     console.log(transactionDataQuery, "transactionDataQuery");
     console.log(transactionDataQuery1, "transactionDataQuery1");
     console.log(initialQuery, "initialQuery");
-    
+
 
     const incomeData = await income.aggregate([
         {
@@ -485,16 +485,16 @@ exports.getRecipetReport = async (req, user) => {
             matchQuery['result.circleId'] = typeof req.circleId === 'number' ? req.circleId : parseInt(req.circleId);
         }
 
-        if (user.role != 'Admin') {
 
-            if (req.unitId) {
-                matchQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+            if (user.role != 'Admin') {
+                if (req.unitId) {
+                    matchQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+                }
+            } else {
+                if (req.unitId) {
+                    matchQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
+                }
             }
-        } else {
-            if (req.unitId) {
-                matchQuery['result.unitId'] = typeof req.unitId === 'number' ? req.unitId : parseInt(req.unitId);
-            }
-        }
 
         console.log(matchQuery);
 
@@ -509,17 +509,17 @@ exports.getRecipetReport = async (req, user) => {
             matchQuery['circleId'] = typeof req.circleId == Number ? req.circleId : parseInt(req.circleId);
         }
 
-        // if (user.role != 'Admin') {
-            if (req.unitId) {
-                matchQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
-            }
-        // }
+        if (user.role != 'Admin') {
+        if (req.unitId) {
+            matchQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
+        }
+        }
         if (req.incomeId) {
             matchQuery['fromHead'] = typeof req.incomeId == Number ? req.incomeId : parseInt(req.incomeId);
         }
     }
 
-    // console.log(matchQuery, "matchQuerymatchQuery");
+    console.log(matchQuery, "matchQuerymatchQuery");
 
 
     try {
