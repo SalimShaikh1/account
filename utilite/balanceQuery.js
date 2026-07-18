@@ -1,6 +1,7 @@
 const transaction = require("../models/transaction");
 const income = require("../models/income")
 const expense = require("../models/expense");
+const { getRoleFilter } = require("./roleFilter");
 
 
 
@@ -19,12 +20,12 @@ exports.getReport = async (req, user) => {
     //     transactionDataQuery['unitId'] = typeof req.unitId == Number ? req.unitId : parseInt(req.unitId);
     // }
 
+    const roleFilter = getRoleFilter(user);
+    if (roleFilter.halquaId) transactionDataQuery.halquaId = roleFilter.halquaId;
+    if (roleFilter.unitId) transactionDataQuery.unitId = roleFilter.unitId;
+    if (roleFilter.circleId) transactionDataQuery.circleId = roleFilter.circleId;
     if (user.role == 'Circle Cashier') {
         transactionDataQuery.circleId = parseInt(user.circleId);
-    } else if (user.role == 'Account') {
-        transactionDataQuery.unitId = parseInt(user.unitId);
-    } else if (user.role == 'Auditor') {
-        transactionDataQuery.halquaId = parseInt(user.halquaId);
     }
 
 

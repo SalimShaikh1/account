@@ -3,25 +3,15 @@ const income = require("../models/income")
 const expense = require("../models/expense");
 const expenseQ = require("./expenseQuery");
 const incomeQ = require("./incomeQuery");
+const { getRoleFilter } = require("./roleFilter");
 
 exports.getTransactions = async (req) => {
     const { type, unitId } = req.query
-    const filter = {};
-
-    console.log(req.user);
-
-
-    // if (halquaId) filter.halquaId = parseInt(halquaId);
-    // if (unitId) filter.unitId = parseInt(unitId);
-    // filter.createdBy = req.user.id;
+    const roleFilter = getRoleFilter(req.user);
+    const filter = { ...roleFilter };
 
     if (req.user.role == 'Circle Cashier') {
-        filter.unitId = parseInt(req.user.unitId);
         filter.createdBy = req.user.id;
-    } else if (req.user.role == 'Account') {
-        filter.unitId = parseInt(req.user.unitId);
-    } else if (req.user.role == 'Auditor') {
-        filter.unitId = parseInt(unitId);
     }
 
     if (type) filter.type = type;

@@ -1,9 +1,9 @@
 const unit = require("../models/unit");
+const { getRoleFilter } = require("./roleFilter");
 
 exports.getUnit = async (req) => {
     const { halquaId } = req.query
-    const filter = {};
-    // filter.createdBy = req.user.id;
+    const filter = getRoleFilter(req.user);
     if (halquaId) filter.halquaId = parseInt(halquaId);
 
     //console.log(filter);

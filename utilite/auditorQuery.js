@@ -3,18 +3,17 @@ const user = require("../models/user")
 const halqua = require("../models/halqua");
 const unit = require("../models/unit");
 const circle = require("../models/circle");
+const { getRoleFilter } = require("./roleFilter");
 
 
 exports.getAuditor = async (req, user) => {
 const { halquaId, unitId, circleId, userId } = req
-    const filter = {};
+    const filter = getRoleFilter(user);
 
     if (halquaId) filter.halquaId = parseInt(halquaId);
     if (unitId) filter.unitId = parseInt(unitId);
     if (circleId) filter.circleId = parseInt(circleId);
     if (userId) filter.userId = parseInt(userId);
-    // filter.createdBy = req.user.id;
-    console.log(filter);
 
     const auditors = await auditor.aggregate([
         {

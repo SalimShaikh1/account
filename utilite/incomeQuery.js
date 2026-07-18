@@ -1,28 +1,16 @@
 const income = require("../models/income");
+const { getRoleFilter } = require("./roleFilter");
 
 exports.getIncomes = async (req) => {
     const { halquaId, unitId, circleId } = req.query
     const filter = {
         'name': {
             $ne: "Contra"
-        }
+        },
+        ...getRoleFilter(req.user)
     };
 
-    // if (req.user) filter.createdBy = req.user.id;
-
-
-    console.log(unitId);
-
-
-    if (req.user.role == 'Circle Cashier' || req.user.role == 'Account') {
-        filter.unitId = parseInt(req.user.unitId);
-    } else if (req.user.role == 'Auditor') {
-        filter.halquaId = parseInt(req.user.halquaId);
-    }else if (req.user.role == 'Admin') {
-        if (unitId) filter.unitId = parseInt(unitId);
-    }
-
-    console.log(filter, 123);
+    if (unitId) filter.unitId = parseInt(unitId);
 
     const incomes = await income.aggregate([
         {
@@ -73,13 +61,9 @@ exports.getIncomesWithTr = async (req) => {
     const filter = {
         'name': {
             $ne: "Contra"
-        }
+        },
+        ...getRoleFilter(req.user)
     };
-    // filter.createdBy = req.user.id;
-    // console.log(req.user.unitId);
-
-    // if (halquaId) filter.halquaId = parseInt(halquaId);
-    if (req.user.unitId) filter.unitId = req.user.unitId;
     const incomes = await income.aggregate([
         {
             $match: filter

@@ -1,4 +1,5 @@
 const Halqua = require("../models/halqua");
+const { getHalquaFilter } = require("../utilite/roleFilter");
 const { sendError, sendSuccess } = require("../Middleware/response");
 
 // Create
@@ -39,7 +40,8 @@ exports.createHalqua = async (req, res) => {
 // Read All
 exports.getHalquas = async (req, res) => {
   try {
-    const halquas = await Halqua.find();
+    const filter = getHalquaFilter(req.user);
+    const halquas = await Halqua.find(filter);
     return sendSuccess(res, "Halquas Fetched successfully", halquas);
   } catch (err) {
     return sendError(res, "Server error", [err.message], 500);

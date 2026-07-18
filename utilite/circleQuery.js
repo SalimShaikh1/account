@@ -1,42 +1,16 @@
 const circle = require("../models/circle");
+const { getRoleFilter } = require("./roleFilter");
 
 exports.getCircle = async (req) => {
     const { halquaId, unitId, type } = req.query
-    const filter = {};
+    const filter = getRoleFilter(req.user);
 
-    // if (halquaId) filter.halquaId = parseInt(halquaId);
-    // if (unitId) filter.unitId = parseInt(unitId);
-    // filter.createdBy = req.user.id;
+    if (halquaId) filter.halquaId = parseInt(halquaId);
+    if (unitId) filter.unitId = parseInt(unitId);
 
-    // console.log(filter);
-
-    try {
-
-        if (req.user.role == 'Account') {
-            filter.unitId = parseInt(req.user.unitId);
-        } else if (req.user.role == 'Auditor') {
-            filter.halquaId = parseInt(req.user.halquaId);
-        } else if (req.user.role == 'Admin' && unitId) {
-            filter.unitId = parseInt(unitId);
-            console.log(unitId == '', 'unitId');
-            console.log(unitId == ' ', 'unitId');
-            console.log(!unitId, 'unitId');
-
-
-        }
-        // else{
-        //     filter._id = null
-        // }
-
-        if (type == 'report') {
-            filter.unitId = parseInt(unitId);
-        }
-
-    } catch (err) {
-        console.log(err);
-
+    if (type == 'report') {
+        filter.unitId = parseInt(unitId);
     }
-
 
     const circles = await circle.aggregate([
         {

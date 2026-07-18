@@ -2,6 +2,7 @@ const Book = require("../models/books");
 const Halqua = require("../models/halqua");
 const Unit = require("../models/unit");
 const Circle = require("../models/circle");
+const { getRoleFilter } = require("./roleFilter");
 exports.genrateVocherNumber = async (data) => {
     var book;
     const halquaName = await Halqua.findOne({ _id: data.user.halquaId }).select("name");
@@ -52,15 +53,7 @@ exports.getBooks = async (req) => {
     
 
     const { halquaId, unitId, circleId } = req.user
-    const filter = {};
-
-    if (req.user.role == 'Circle Cashier') {
-        filter.circleId = parseInt(req.user.circleId);
-    } else if (req.user.role == 'Account') {
-        filter.unitId = parseInt(req.user.unitId);
-    } else if (req.user.role == 'Auditor') {
-        filter.halquaId = parseInt(req.user.halquaId);
-    }
+    const filter = getRoleFilter(req.user);
 
 
 
