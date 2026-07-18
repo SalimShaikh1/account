@@ -9,7 +9,8 @@ exports.getRoleFilter = (user) => {
         case 'Auditor':
             if (user.halquaId) filter.halquaId = parseInt(user.halquaId);
             break;
-        case 'Account':
+        case 'Accountant':
+        case 'Amir e Muqami':
         case 'Circle Cashier':
             if (user.unitId) filter.unitId = parseInt(user.unitId);
             break;
@@ -28,7 +29,7 @@ exports.getHalquaFilter = (user) => {
         case 'Auditor':
             if (user.halquaId) filter._id = parseInt(user.halquaId);
             break;
-        case 'Account':
+        case 'Accountant':
         case 'Circle Cashier':
             if (user.halquaId) filter._id = parseInt(user.halquaId);
             break;

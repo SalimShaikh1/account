@@ -15,6 +15,7 @@ const faqRoutes = require("./routes/faq");
 const balanceRoutes = require("./routes/balance");
 const auditorRoutes = require("./routes/auditor");
 const permissionRoutes = require("./routes/permissions");
+const unitDefaultRoutes = require("./routes/unitDefault");
 const fs = require('fs');
 const path = require('path');
 
@@ -46,6 +47,7 @@ app.use("/api/faq", faqRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/auditor", auditorRoutes);
 app.use("/api/permissions", permissionRoutes);
+app.use("/api/unit-defaults", unitDefaultRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

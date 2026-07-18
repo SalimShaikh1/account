@@ -2,6 +2,7 @@ const halqua = require("../models/halqua");
 const Unit = require("../models/unit");
 const Income = require("../models/income");
 const Expense = require("../models/expense");
+const UnitDefault = require("../models/unitDefault");
 const unitQ = require("../utilite/unitQuery");
 const { sendError, sendSuccess } = require("../Middleware/response");
 
@@ -31,56 +32,37 @@ exports.createUnit = async (req, res) => {
       req.body["createdBy"] = req.user.id;
       const unit = await Unit.create(req.body);
 
-      // console.log(unit);
+      const incomeDefaults = await UnitDefault.find({ type: 'income', isDeleted: { $ne: true } });
+      const expenseDefaults = await UnitDefault.find({ type: 'expense', isDeleted: { $ne: true } });
+      const subExpenseDefaults = await UnitDefault.find({ type: 'subExpense', isDeleted: { $ne: true } });
 
-      let openingIncome = [
-        {
-          "name": "Zakat Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "Special Donation", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": false
-        },
-        {
-          "name": "Sadaqua Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "Fitra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": false
-        },
-        {
-          "name": "GIO", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": false
-        },
-        {
-          "name": "Contra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        }
-      ]
+      if (incomeDefaults.length) {
+        const openingIncome = incomeDefaults.map(d => ({
+          name: d.name, unitShare: d.unitShare, cityShare: d.cityShare, halquaShare: d.halquaShare,
+          halquaId: unit.halquaId, unitId: unit._id, createdBy: unit.createdBy, isDeleted: false, oneTime: d.oneTime
+        }));
+        await Income.create(openingIncome);
+      }
 
-      let openingExpense = [
-        {
-          "expenseMain": "Contra", "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        }
-      ]
+      let expense;
+      if (expenseDefaults.length) {
+        const openingExpense = expenseDefaults.map(d => ({
+          expenseMain: d.expenseMain, halquaId: unit.halquaId,
+          unitId: unit._id, createdBy: unit.createdBy, isDeleted: false, oneTime: d.oneTime
+        }));
+        expense = await Expense.create(openingExpense);
+      }
 
-      const income = await Income.create(openingIncome)
-      const expense = await Expense.create(openingExpense)
+      if (subExpenseDefaults.length && expense) {
+        const mainExpense = Array.isArray(expense) ? expense : [expense];
+        const openingSubExpense = subExpenseDefaults.map((d, i) => ({
+          expenseMain: d.expenseMain, expenseSub: d.expenseSub,
+          expenseId: mainExpense.find(e => e.expenseMain === d.expenseMain)?._id || mainExpense[0]?._id,
+          halquaId: unit.halquaId, unitId: unit._id, createdBy: unit.createdBy, isDeleted: false, oneTime: d.oneTime
+        }));
+        await Expense.create(openingSubExpense);
+      }
 
-      let openingSubExpense = [
-        {
-          "expenseMain": "Contra", "expenseSub": "Contra", "expenseId":expense._id, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        }
-      ]
-
-      const subExpense = await Expense.create(openingSubExpense)
-
-
-      res.status(201).json(unit);
       return sendSuccess(res, "Unit Created successfully", unit);
     }
   } catch (err) {
