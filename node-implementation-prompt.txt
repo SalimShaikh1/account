@@ -1,80 +1,182 @@
-Create a Mongoose model, Express routes, and controller for a dynamic permission system in my existing Node.js backend. The frontend Angular app already has a PermissionService that fetches from GET /api/permissions and saves via PUT /api/permissions.
+# OpenAI Prompt – Implement Multi-Device Session Management in an Existing Node.js + MongoDB + Angular Application
 
-First, explore the existing project structure to understand the patterns used (look at existing models in a models/ folder, existing routes in routes/, and how they're registered in the main server file).
+I already have a working application with separate Node.js (backend) and Angular (frontend) projects. The project structure, authentication flow, APIs, database models, and Angular architecture are already implemented.
 
-Then implement:
+**Do not generate a new project or change the existing architecture unless absolutely necessary.**
 
-1. **Model** - `models/Permission.js` with fields: menuPermissions (Object), pagePermissions (Object), actionPermissions (Object), formFieldPermissions (Object), timestamps
+Your task is to analyse my existing codebase and implement the required functionality by making minimal, clean, and production-ready changes that follow the existing coding style, folder structure, naming conventions, and architecture.
 
-2. **Routes** - `routes/permissions.js` with:
-   - `GET /api/permissions` - returns the single permissions document. If none exists, create one with the default data below and return it. Response: `{ success: true, data: <doc> }`
-   - `PUT /api/permissions` - accepts full permission object in body, upserts, returns updated doc. Response: `{ success: true, data: <doc> }`
+## Objective
 
-3. **Register** the route in the main server file following the existing pattern.
+Implement a secure multi-device login and session management mechanism.
 
-Use the exact same patterns as existing models/routes (error handling, response format, imports).
+## Existing Environment
 
-Default data to seed when GET returns nothing:
+* Backend: Node.js
+* Database: MongoDB
+* Frontend: Angular
+* Authentication: Use the existing authentication implementation already available in the project.
+* The backend and frontend are separate projects.
+* Preserve all existing APIs unless modifications are required.
+* Reuse existing services, middleware, utilities, models, guards, interceptors, and authentication logic wherever possible.
 
-```json
-{
-  "menuPermissions": {
-    "Dashboard": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "Receipt": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "Contra": ["Circle Cashier"],
-    "Voucher": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "Report": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "Masters": ["Admin", "Account"],
-    "Halqua": ["Admin"],
-    "Unit": ["Admin"],
-    "Circle": ["Admin", "Account"],
-    "Income": ["Admin", "Account"],
-    "Expense": ["Admin", "Account"],
-    "Books": ["Admin", "Account"],
-    "User": ["Admin", "Account"],
-    "Auditor": ["Admin"],
-    "Role": ["Admin"],
-    "FAQ": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "Profile": ["Admin", "Account", "Circle Cashier", "Auditor"]
-  },
-  "pagePermissions": {
-    "home": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "receipt": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "contra": ["Circle Cashier"],
-    "voucher": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "report": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "halqua": ["Admin"],
-    "unit": ["Admin"],
-    "circle": ["Admin", "Account"],
-    "income": ["Admin", "Account"],
-    "expense": ["Admin", "Account"],
-    "book": ["Admin", "Account"],
-    "user": ["Admin", "Account"],
-    "auditor": ["Admin"],
-    "role": ["Admin"],
-    "faq": ["Admin", "Account", "Circle Cashier", "Auditor"],
-    "profile": ["Admin", "Account", "Circle Cashier", "Auditor"]
-  },
-  "actionPermissions": {
-    "table": {
-      "edit": ["Admin", "Account", "Circle Cashier", "Auditor"],
-      "delete": ["Admin"],
-      "audit": ["Auditor"],
-      "view": ["Admin", "Account", "Circle Cashier", "Auditor"],
-      "toggle": ["Admin"],
-      "share": ["Admin", "Account", "Circle Cashier", "Auditor"]
-    },
-    "Receipt": { "edit": ["Admin", "Circle Cashier", "Auditor"] },
-    "Voucher": { "edit": ["Admin", "Circle Cashier", "Auditor"] }
-  },
-  "formFieldPermissions": {
-    "circle": { "halquaId": ["Admin"], "unitId": ["Admin"] },
-    "income": { "halquaId": ["Admin"], "unitId": ["Admin"] },
-    "expense": { "halquaId": ["Admin"], "unitId": ["Admin"] },
-    "book": { "halquaId": ["Admin"], "unitId": ["Admin"], "circleId": ["Admin"] },
-    "user": { "halquaId": ["Admin"], "unitId": ["Admin"], "circleId": ["Admin"] }
-  }
-}
-```
+## Functional Requirements
 
-Return: the full content of all files created/modified.
+### Detect Existing Login
+
+When a user logs in from another device:
+
+* Detect whether the user already has one or more active sessions.
+* Identify the currently active device(s).
+* Do not allow duplicate session creation without user confirmation.
+
+### User Decision
+
+Return an API response that allows the Angular application to display a confirmation dialog.
+
+The dialog should present options similar to:
+
+* Continue login on this device and terminate the previous session(s).
+* Cancel login and continue using the existing device.
+* Keep both devices logged in (only if multiple concurrent sessions are enabled through configuration).
+
+The backend should not assume a default choice.
+
+The frontend must explicitly send the user's selected option.
+
+## Force Logout Using WebSocket
+
+Use WebSocket (or the existing socket implementation if already available) to perform real-time session management.
+
+If the user chooses to continue on the new device while terminating the previous session:
+
+* Immediately notify the previous device through WebSocket.
+* Force logout the previous device without waiting for token expiry.
+* Clear authentication state.
+* Redirect the user to the login screen.
+* Display a meaningful message explaining why the logout occurred.
+
+If multiple concurrent sessions are allowed, no logout event should be sent.
+
+## Backend Requirements
+
+Modify the existing backend only where required.
+
+Implement:
+
+* Session tracking
+* Device identification
+* Active session storage
+* Session validation
+* Session termination
+* Force logout
+* WebSocket event handling
+* Token validation
+* Token invalidation
+* Refresh token handling (if already implemented)
+* Logout from current device
+* Logout from all devices
+* Session cleanup
+* Session expiration
+* Concurrent login handling
+* Proper error handling
+* Security best practices
+
+Reuse the existing authentication middleware whenever possible.
+
+Avoid duplicate logic.
+
+## MongoDB
+
+If additional collections or fields are required:
+
+* Explain why.
+* Modify only the required schema.
+* Maintain backward compatibility.
+* Use proper indexes where necessary.
+
+## Angular Requirements
+
+Modify the existing Angular application only where necessary.
+
+Reuse:
+
+* Existing authentication service
+* Existing HTTP interceptor
+* Existing route guards
+* Existing shared services
+* Existing UI components
+
+Implement:
+
+* Login confirmation dialog
+* Session conflict handling
+* WebSocket listener
+* Automatic logout
+* Session expired handling
+* Force logout handling
+* User notifications
+* Proper loading and error states
+
+## WebSocket Requirements
+
+Reuse the existing WebSocket implementation if one already exists.
+
+Otherwise implement a minimal solution.
+
+Create clearly defined socket events such as:
+
+* user-login
+* session-conflict
+* force-logout
+* session-updated
+
+Use appropriate naming if the existing project already follows another convention.
+
+## API Behaviour
+
+If existing APIs require modification:
+
+* Explain why.
+* Keep changes backward compatible whenever possible.
+* Provide updated request and response examples.
+
+## Code Quality
+
+Follow the existing project architecture.
+
+Do not rewrite working modules.
+
+Avoid unnecessary refactoring.
+
+Implement only the required changes.
+
+Write clean, modular, reusable, maintainable code.
+
+Add comments only where they improve understanding.
+
+## Expected Output
+
+For every change:
+
+1. Explain why the change is needed.
+2. Show the original code (if modification is required).
+3. Show the updated code.
+4. Explain how the new logic integrates with the existing application.
+5. Mention all files that require modification.
+6. Mention whether database migration is required.
+7. Explain any API changes.
+8. Explain any Angular changes.
+9. Explain any WebSocket changes.
+10. Explain how to test the feature.
+
+## Important Instructions
+
+* Never replace existing modules unless necessary.
+* Never generate an entirely new authentication system.
+* Never ignore the existing architecture.
+* Prefer extending existing code over creating duplicate functionality.
+* Maintain backward compatibility whenever possible.
+* If multiple implementation approaches are possible, explain the pros and cons before choosing one.
+* If any assumption is required because code is missing, clearly state the assumption instead of inventing project-specific behaviour.
+* Wait for my code before generating implementation details. Analyse the provided files first, then produce incremental changes instead of rewriting the entire project.

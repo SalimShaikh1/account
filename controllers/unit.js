@@ -32,17 +32,17 @@ exports.createUnit = async (req, res) => {
       req.body["createdBy"] = req.user.id;
       const unit = await Unit.create(req.body);
 
-      // const incomeDefaults = await UnitDefault.find({ type: 'income', isDeleted: { $ne: true } });
+      const incomeDefaults = await UnitDefault.find({ type: 'income', isDeleted: { $ne: true } });
       // const expenseDefaults = await UnitDefault.find({ type: 'expense', isDeleted: { $ne: true } });
       // const subExpenseDefaults = await UnitDefault.find({ type: 'subExpense', isDeleted: { $ne: true } });
 
-      // if (incomeDefaults.length) {
-      //   const openingIncome = incomeDefaults.map(d => ({
-      //     name: d.name, unitShare: d.unitShare, cityShare: d.cityShare, halquaShare: d.halquaShare,
-      //     halquaId: unit.halquaId, unitId: unit._id, createdBy: unit.createdBy, isDeleted: false, oneTime: d.oneTime
-      //   }));
-      //   await Income.create(openingIncome);
-      // }
+      if (incomeDefaults.length) {
+        const openingIncome = incomeDefaults.map(d => ({
+          name: d.name, unitShare: d.unitShare, cityShare: d.cityShare, halquaShare: d.halquaShare,
+          halquaId: unit.halquaId, unitId: unit._id, createdBy: unit.createdBy, isDeleted: false, oneTime: d.oneTime
+        }));
+        await Income.create(openingIncome);
+      }
 
       // let expense;
       // if (expenseDefaults.length) {
@@ -63,32 +63,32 @@ exports.createUnit = async (req, res) => {
       //   await Expense.create(openingSubExpense);
       // }
 
-      let openingIncome = [
-        {
-          "name": "Zakat Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "Special Donation", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "Sadaqua Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "Fitra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "GIO", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        },
-        {
-          "name": "Contra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
-          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
-        }
-      ]
+      // let openingIncome = [
+      //   {
+      //     "name": "Zakat Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+      //     "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+      //   },
+      //   {
+      //     "name": "Special Donation", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+      //     "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+      //   },
+      //   {
+      //     "name": "Sadaqua Opening", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+      //     "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+      //   },
+      //   {
+      //     "name": "Fitra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+      //     "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+      //   },
+      //   {
+      //     "name": "GIO", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+      //     "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+      //   },
+      //   {
+      //     "name": "Contra", "unitShare": 100, "cityShare": 0, "halquaShare": 0, "halquaId": unit.halquaId,
+      //     "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+      //   }
+      // ]
 
       let openingExpense = [
         {
@@ -97,7 +97,7 @@ exports.createUnit = async (req, res) => {
         }
       ]
 
-      const income = await Income.create(openingIncome)
+      // const income = await Income.create(openingIncome)
       const expense = await Expense.create(openingExpense)
 
       let openingSubExpense = [

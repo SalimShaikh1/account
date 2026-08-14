@@ -16,10 +16,14 @@ const balanceRoutes = require("./routes/balance");
 const auditorRoutes = require("./routes/auditor");
 const permissionRoutes = require("./routes/permissions");
 const unitDefaultRoutes = require("./routes/unitDefault");
+const sessionRoutes = require("./routes/session");
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const { init: initSocket } = require("./utilite/socketManager");
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -28,6 +32,7 @@ app.use(express.json());
 
 // Connect DB
 connectDB();
+initSocket(server);
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -48,7 +53,8 @@ app.use("/api/balance", balanceRoutes);
 app.use("/api/auditor", auditorRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/unit-defaults", unitDefaultRoutes);
+app.use("/api/sessions", sessionRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
