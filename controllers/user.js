@@ -4,7 +4,23 @@ const Session = require("../models/session");
 const userQ = require("../utilite/userQuery");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const nameMaster = require("../utilite/nameMaster");
 const { sendError, sendSuccess } = require("../Middleware/response");
+
+const getFullName = (user) =>
+  [user?.firstName, user?.middleName, user?.lastName].filter(Boolean).join(" ");
+
+const registerUserName = async (user, userId) => {
+  const fullName = getFullName(user);
+  if (!fullName) return;
+  await nameMaster.ensureNameMaster({
+    name: fullName,
+    source: nameMaster.NAME_SOURCES.USER,
+    sourceModel: "User",
+    sourceId: user._id,
+    createdBy: userId,
+  });
+};
 
 // Create
 exports.createUser = async (req, res) => {
@@ -33,6 +49,7 @@ exports.createUser = async (req, res) => {
         new: true,
       });
       if (!user) return sendError(res, "User not found", [], 401);
+      await registerUserName(user, req.user.id);
       return sendSuccess(res, "User updated successfully", user);
     } else {
       req.body["createdBy"] = req.user.id;
@@ -40,6 +57,7 @@ exports.createUser = async (req, res) => {
       console.log(req.body);
       
       const user = await User.create(req.body);
+      await registerUserName(user, req.user.id);
       return sendSuccess(res, "User created successfully", user);
     }
   } catch (err) {

@@ -3,7 +3,28 @@ const UserDetilas = require("../utilite/userDetails");
 const bookDetails = require("../utilite/bookDetails")
 const transactionQ = require("../utilite/transactionQuery")
 const income = require("../utilite/income")
+const nameMaster = require("../utilite/nameMaster")
 const { sendError, sendSuccess } = require("../Middleware/response");
+
+const registerTransactionNames = async (transaction, userId) => {
+  await nameMaster.ensureNameMaster({
+    name: transaction?.name,
+    source: nameMaster.NAME_SOURCES.DONOR,
+    sourceModel: "Transaction",
+    sourceId: transaction?._id,
+    createdBy: userId,
+  });
+
+  if (transaction?.collected) {
+    await nameMaster.ensureNameMaster({
+      name: transaction.collected,
+      source: nameMaster.NAME_SOURCES.COLLECTED_BY,
+      sourceModel: "Transaction",
+      sourceId: transaction._id,
+      createdBy: userId,
+    });
+  }
+};
 
 // Create
 exports.createTransaction = async (req, res) => {
@@ -20,6 +41,7 @@ exports.createTransaction = async (req, res) => {
       });
       await income.divideShare(transaction)
       if (!transaction) return sendError(res, "Transaction not found", [], 401);
+      await registerTransactionNames(transaction, req.user.id);
       return sendSuccess(res, "transaction Update successfully", transaction);
     } else {
       req.body["createdBy"] = req.user.id;
@@ -43,9 +65,10 @@ exports.createTransaction = async (req, res) => {
         }
         await income.divideShare(transaction)
       }
-      else{
-        await transactionQ.setIds(transaction)
-      }
+else {
+          await transactionQ.setIds(transaction)
+        }
+      await registerTransactionNames(transaction, req.user.id);
       return sendSuccess(res, "transaction Added successfully", transaction);
     }
   } catch (err) {

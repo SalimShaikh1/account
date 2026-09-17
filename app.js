@@ -17,6 +17,7 @@ const auditorRoutes = require("./routes/auditor");
 const permissionRoutes = require("./routes/permissions");
 const unitDefaultRoutes = require("./routes/unitDefault");
 const sessionRoutes = require("./routes/session");
+const nameMasterRoutes = require("./routes/nameMaster");
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -54,6 +55,8 @@ app.use("/api/auditor", auditorRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/unit-defaults", unitDefaultRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use("/api/name-master", nameMasterRoutes);
+app.use("/api/names", nameMasterRoutes);
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
