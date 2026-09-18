@@ -55,7 +55,7 @@ exports.createTransaction = async (req, res) => {
       console.log(data);
 
 
-      if (data.name != "Withdraw" && data.name != "Deposit" && data.bookId) {
+      if (data.name != "Withdraw" && data.name != "Deposit" && data.name != "Closing Balance") {
         if (data.type == 'Voucher') {
           await bookDetails.updateVoucher(transaction)
         }
@@ -63,6 +63,8 @@ exports.createTransaction = async (req, res) => {
           await bookDetails.updateBook(transaction)
         }
         await income.divideShare(transaction)
+      }else if(data.name == "Closing Balance"){
+        await transactionQ.saveOpening(transaction)
       }
       else {
         await transactionQ.setIds(transaction)

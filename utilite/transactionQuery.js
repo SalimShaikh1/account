@@ -998,3 +998,7 @@ exports.setIds = async (req) => {
 
     req.save();
 }
+
+exports.saveOpening = async (req) => {
+    req.save();
+}
