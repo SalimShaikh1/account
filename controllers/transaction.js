@@ -55,8 +55,7 @@ exports.createTransaction = async (req, res) => {
       console.log(data);
 
 
-      if (data.name != "Withdraw" && data.name != "Deposit") {
-
+      if (data.name != "Withdraw" && data.name != "Deposit" && data.bookId) {
         if (data.type == 'Voucher') {
           await bookDetails.updateVoucher(transaction)
         }
@@ -65,9 +64,9 @@ exports.createTransaction = async (req, res) => {
         }
         await income.divideShare(transaction)
       }
-else {
-          await transactionQ.setIds(transaction)
-        }
+      else {
+        await transactionQ.setIds(transaction)
+      }
       await registerTransactionNames(transaction, req.user.id);
       return sendSuccess(res, "transaction Added successfully", transaction);
     }
