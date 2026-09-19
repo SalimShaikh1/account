@@ -94,6 +94,14 @@ exports.createUnit = async (req, res) => {
         {
           "expenseMain": "Contra", "halquaId": unit.halquaId,
           "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+        {
+          "expenseMain": "Hissa-e-Halqua", "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
+        },
+        {
+          "expenseMain": "Hissa-e-Nazime Shaher", "halquaId": unit.halquaId,
+          "unitId": unit._id, "createdBy": unit.createdBy, "isDeleted": false, "oneTime": true
         }
       ]
 

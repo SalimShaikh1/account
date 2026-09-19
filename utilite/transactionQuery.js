@@ -893,7 +893,7 @@ exports.getBalance = async (req) => {
                     halquaSum: {
                         $sum: {
                             $cond: [
-                                { $eq: ["$expenseMain", "Halqua Hissa"] },
+                                { $eq: ["$expenseMain", "Hissa-e-Halqua"] },
                                 "$result.amount",
                                 0
                             ]
@@ -902,7 +902,7 @@ exports.getBalance = async (req) => {
                     citySum: {
                         $sum: {
                             $cond: [
-                                { $eq: ["$expenseMain", "Nazime Shahar"] },
+                                { $eq: ["$expenseMain", "Hissa-e-Nazime Shaher"] },
                                 "$result.amount",
                                 0
                             ]
@@ -913,8 +913,8 @@ exports.getBalance = async (req) => {
                             $cond: [
                                 {
                                     $and: [
-                                        { $ne: ["$expenseMain", "Halqua Hissa"] },
-                                        { $ne: ["$expenseMain", "Nazime Shahar"] }
+                                        { $ne: ["$expenseMain", "Hissa-e-Halqua"] },
+                                        { $ne: ["$expenseMain", "Hissa-e-Nazime Shaher"] }
                                     ]
                                 },
                                 "$result.amount",
