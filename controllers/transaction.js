@@ -65,6 +65,7 @@ exports.createTransaction = async (req, res) => {
         await income.divideShare(transaction)
       }else if(data.name == "Closing Balance"){
         await transactionQ.saveOpening(transaction)
+        await income.divideShare(transaction)
       }
       else {
         await transactionQ.setIds(transaction)
