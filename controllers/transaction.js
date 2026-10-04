@@ -50,12 +50,22 @@ exports.createTransaction = async (req, res) => {
       }
 
       const data = await UserDetilas.getUserData(req.body)
+
+
+      if(data.contraId){
+        data.contraId = parseInt(data.contraId)
+      }
+      
+
+      console.log(data);
+
+
       const transaction = await Transaction.create(data);
 
       console.log(data);
 
 
-      if (data.name != "Withdraw" && data.name != "Deposit" && data.name != "Closing Balance") {
+      if (data.receiptVoucherNo != "Contra" && data.name != "Closing Balance") {
         if (data.type == 'Voucher') {
           await bookDetails.updateVoucher(transaction)
         }

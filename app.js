@@ -18,6 +18,7 @@ const permissionRoutes = require("./routes/permissions");
 const unitDefaultRoutes = require("./routes/unitDefault");
 const sessionRoutes = require("./routes/session");
 const nameMasterRoutes = require("./routes/nameMaster");
+const contraRoutes = require("./routes/contra");
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -57,6 +58,7 @@ app.use("/api/unit-defaults", unitDefaultRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/name-master", nameMasterRoutes);
 app.use("/api/names", nameMasterRoutes);
+app.use("/api/contra", contraRoutes);
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

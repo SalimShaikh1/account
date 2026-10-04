@@ -6,7 +6,7 @@ const incomeQ = require("./incomeQuery");
 const { getRoleFilter } = require("./roleFilter");
 
 exports.getTransactions = async (req) => {
-    const { type, unitId } = req.query
+    const { type, unitId, contraId } = req.query
     const roleFilter = getRoleFilter(req.user);
     const filter = { ...roleFilter };
 
@@ -15,8 +15,12 @@ exports.getTransactions = async (req) => {
     }
 
     if (type) filter.type = type;
+    if (contraId) filter.contraId = parseInt(contraId);
 
-    // console.log(filter);
+    console.log(filter);
+
+    filter.isDeleted = { $ne: true };
+    filter.contraId = {$exists: false };
 
 
     const transactions = await transaction.aggregate([
@@ -24,7 +28,7 @@ exports.getTransactions = async (req) => {
             $match: filter
         },
         {
-            $sort: { receiptVoucherDate: -1 }
+            $sort: { createdOn: -1 }
         },
         {
             $lookup: {
@@ -149,7 +153,8 @@ exports.getTransactions = async (req) => {
     ]);
 
 
-
+    console.log(transactions);
+    
 
     return transactions;
 }

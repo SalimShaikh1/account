@@ -9,12 +9,12 @@ const transactionSchema = new mongoose.Schema({
   amount: Number,
   head: Number,
   subHead: Number,
-  paymentMethod : String,
+  paymentMethod: String,
   collected: String,
   bankDate: String,
   refNo: String,
   status: String,
-  event : String,
+  event: String,
   imagesPath: String,
   description: String,
   halquaId: Number,
@@ -24,28 +24,29 @@ const transactionSchema = new mongoose.Schema({
   cityShare: Number,
   unitShare: Number,
   halquaShare: Number,
+  contraId: Number,
   audited: {
-  type: Boolean,
-  default: false
-},
+    type: Boolean,
+    default: false,
+  },
   auditedStatus: {
-  type: String,
-  default: "Pending"
-},
+    type: String,
+    default: "Pending"
+  },
   auditedBy: {
-  type: Number,
-  default: null
-},
+    type: Number,
+    default: null
+  },
   auditedOn: {
-  type: Date,
-  default: null
-},
+    type: Date,
+    default: null
+  },
   auditedRemark: {
+    type: String,
+    default: ""
+  },
+  fromHead: Number,
   type: String,
-  default: ""
-},
-  fromHead:Number,
-  type:String,
   createdBy: Number,
   createdOn: { type: Date, default: Date.now },
   modifiedBy: Number,

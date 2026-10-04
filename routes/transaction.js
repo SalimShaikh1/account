@@ -42,4 +42,6 @@ router.post("/vocherNumber", auth, getVocherNumber);
 
 router.post("/updateAuditStatus", auth, updateAuditStatus);
 
+router.post("/delete", auth, deleteTransaction);
+
 module.exports = router;
