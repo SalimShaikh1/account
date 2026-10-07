@@ -111,6 +111,15 @@ exports.getTransaction = async (req, res) => {
     return sendError(res, "Server error", [err.message], 500);
   }
 };
+exports.getTransactionContra = async (req, res) => {
+  try {
+    const transactions = await transactionQ.getTransactionsContra(req);
+    return sendSuccess(res, "Transactions fetched  successfully", transactions);
+    res.json(transactions);
+  } catch (err) {
+    return sendError(res, "Server error", [err.message], 500);
+  }
+};
 
 // Delete
 exports.deleteTransaction = async (req, res) => {

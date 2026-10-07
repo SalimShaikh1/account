@@ -10,5 +10,5 @@ exports.divideShare = async (data) => {
     }
 
 
-    data.save();
+    return data.save();
 }

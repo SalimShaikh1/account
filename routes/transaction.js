@@ -5,7 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const sharp = require('sharp');
 const fs = require('fs');
-const { createTransaction, getTransaction, deleteTransaction, getVocherNumber, getReport, getRecipetReport, getBalance } = require("../controllers/transaction");
+const { createTransaction, getTransaction, getTransactionContra, deleteTransaction, getVocherNumber, getReport, getRecipetReport, getBalance } = require("../controllers/transaction");
 const auth = require("../Middleware/authMiddleware");
 const { updateAuditStatus } = require("../controllers/auditController");
 
@@ -33,6 +33,7 @@ const compressImage = async (req, res, next) => {
 
 router.post("/", auth, upload.single('file'), compressImage, createTransaction);
 router.get("/", auth, getTransaction);
+router.get("/contra", auth, getTransactionContra);
 router.post("/delete", auth, deleteTransaction);
 router.post("/report", auth, getReport);
 router.post("/getBalance", auth, getBalance); 

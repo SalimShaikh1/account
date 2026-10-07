@@ -16,11 +16,161 @@ exports.getTransactions = async (req) => {
 
     if (type) filter.type = type;
     if (contraId) filter.contraId = parseInt(contraId);
+    
 
     console.log(filter);
 
     filter.isDeleted = { $ne: true };
     filter.contraId = {$exists: false };
+
+
+    const transactions = await transaction.aggregate([
+        {
+            $match: filter
+        },
+        {
+            $sort: { createdOn: -1 }
+        },
+        {
+            $lookup: {
+                from: "halquas",
+                localField: "halquaId",
+                foreignField: "_id",
+                as: "halqua",
+            }
+        },
+        {
+            $lookup: {
+                from: "units",
+                localField: "unitId",
+                foreignField: "_id",
+                as: "unit",
+            }
+        },
+        {
+            $lookup: {
+                from: "circles",
+                localField: "circleId",
+                foreignField: "_id",
+                as: "circle",
+            }
+        },
+        {
+            $lookup: {
+                from: "expenses",
+                localField: "head",
+                foreignField: "_id",
+                as: "expenses",
+            }
+        },
+        {
+            $lookup: {
+                from: "expenses",
+                localField: "subHead",
+                foreignField: "_id",
+                as: "expensesSubHead",
+            }
+        },
+        {
+            $lookup: {
+                from: "incomes",
+                localField: "fromHead",
+                foreignField: "_id",
+                as: "incomes",
+            }
+        },
+        {
+            $lookup: {
+                from: "books",
+                localField: "bookId",
+                foreignField: "_id",
+                as: "book",
+            }
+        },
+        {
+            $unwind: {
+                path: "$halqua",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: "$unit",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: "$circle",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: "$expenses",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: "$expensesSubHead",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: "$incomes",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $unwind: {
+                path: "$book",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $addFields: {
+                halquaName: "$halqua.name",
+                unitName: "$unit.name",
+                circleName: "$circle.name",
+                headName: "$expenses.expenseMain",
+                subHeadName: "$expensesSubHead.expenseSub",
+                fromHeadName: "$incomes.name",
+                bookNumber: "$book.bookNumber",
+            }
+        },
+        {
+            $project: {
+                halqua: 0,
+                unit: 0,
+                circle: 0,
+                expenses: 0,
+                expensesSubHead: 0,
+                incomes: 0,
+                book: 0
+            }
+        }
+    ]);
+
+
+    console.log(transactions);
+    
+
+    return transactions;
+}
+
+exports.getTransactionsContra = async (req) => {
+    const { contraId } = req.query
+    const filter = {};
+
+    if (req.user.role == 'Circle Cashier') {
+        filter.createdBy = req.user.id;
+    }
+
+    if (contraId) filter.contraId = parseInt(contraId);
+    filter.isDeleted = { $ne: true };
+    console.log(filter);
 
 
     const transactions = await transaction.aggregate([
@@ -173,20 +323,23 @@ exports.getReport = async (req, user) => {
         },
         'expenseMain': {
             $ne: "Contra"
-        }
+        },
+        'result.isDeleted' : { $ne: true }
     };
 
     const transactionDataQuery = {
         'receiptVoucherDate': {
             $gte: req.startDate,
             $lte: req.endDate
-        }
+        },
+        'isDeleted' : { $ne: true }
     }
 
     const transactionDataQuery1 = {
         'receiptVoucherDate': {
             $lt: req.startDate,
-        }
+        },
+        'isDeleted' : { $ne: true }
     }
 
     const initialQuery = {
@@ -781,19 +934,23 @@ exports.getRecipetReport = async (req, user) => {
 exports.getBalance = async (req) => {
     try {
         const perviousQuery = {
-            type: 'Receipt', receiptVoucherNo: {
+            type: 'Receipt', 
+            receiptVoucherNo: {
                 $ne: "Contra"
-            }
+            },
+            isDeleted:{ $ne: true }
         }
         const currentQuery = {
             type: 'Receipt', receiptVoucherNo: {
                 $ne: "Contra"
-            }
+            },
+            isDeleted:{ $ne: true }
         }
         const tillQuery = {
             'expenseMain': {
                 $ne: "Contra"
-            }
+            },
+            isDeleted:{ $ne: true }
         }
         tillQuery['result.type'] = 'Voucher';
 
@@ -1001,9 +1158,9 @@ exports.setIds = async (req) => {
     req.head = expenseDetails._id;
     req.subHead = subExpenseDetails._id;
 
-    req.save();
+    return req.save();
 }
 
 exports.saveOpening = async (req) => {
-    req.save();
+    return req.save();
 }

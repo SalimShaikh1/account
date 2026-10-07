@@ -1,4 +1,5 @@
 const Contra = require("../models/contra");
+const { getRoleFilter } = require("../utilite/roleFilter");
 const { sendError, sendSuccess } = require("../Middleware/response");
 
 // Create / Update
@@ -37,17 +38,84 @@ exports.createContra = async (req, res) => {
 // Read All
 exports.getContra = async (req, res) => {
   try {
-    const filter = { isDeleted: { $ne: true } };
+    const { unitId, halquaId, circleId, name, receiptVoucherNo } = req.query;
+    const filter = { isDeleted: { $ne: true }, ...getRoleFilter(req.user) };
+
     if (req.user.role == 'Circle Cashier') {
       filter.createdBy = req.user.id;
     }
-    if (req.query.unitId) filter.unitId = parseInt(req.query.unitId);
-    if (req.query.halquaId) filter.halquaId = parseInt(req.query.halquaId);
-    if (req.query.circleId) filter.circleId = parseInt(req.query.circleId);
-    if (req.query.name) filter.name = req.query.name;
-    if (req.query.receiptVoucherNo) filter.receiptVoucherNo = req.query.receiptVoucherNo;
 
-    const contras = await Contra.find(filter).sort({ createdOn: -1 });
+    if (unitId) filter.unitId = parseInt(unitId);
+    if (halquaId) filter.halquaId = parseInt(halquaId);
+    if (circleId) filter.circleId = parseInt(circleId);
+    if (name) filter.name = name;
+    if (receiptVoucherNo) filter.receiptVoucherNo = receiptVoucherNo;
+
+    const contras = await Contra.aggregate([
+      {
+        $match: filter
+      },
+      {
+        $sort: { createdOn: -1 }
+      },
+      {
+        $lookup: {
+          from: "halquas",
+          localField: "halquaId",
+          foreignField: "_id",
+          as: "halqua",
+        }
+      },
+      {
+        $lookup: {
+          from: "units",
+          localField: "unitId",
+          foreignField: "_id",
+          as: "unit",
+        }
+      },
+      {
+        $lookup: {
+          from: "circles",
+          localField: "circleId",
+          foreignField: "_id",
+          as: "circle",
+        }
+      },
+      {
+        $unwind: {
+          path: "$halqua",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $unwind: {
+          path: "$unit",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $unwind: {
+          path: "$circle",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $addFields: {
+          halquaName: "$halqua.name",
+          unitName: "$unit.name",
+          circleName: "$circle.name",
+        }
+      },
+      {
+        $project: {
+          halqua: 0,
+          unit: 0,
+          circle: 0
+        }
+      }
+    ]);
+
     return sendSuccess(res, "Contras fetched successfully", contras);
   } catch (err) {
     return sendError(res, "Server error", [err.message], 500);
